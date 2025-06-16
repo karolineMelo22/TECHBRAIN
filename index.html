@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TechBrain: Engenharia Social</title>
+    <title>TechBrain: Engenharia Social & Segurança</title>
     <style>
-        body {
+         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             color: #fafdff;
-            background-image: url('https://i.imgur.com/4mw8WBo.png');
+            background-image: url('1.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -19,131 +20,307 @@
             justify-content: center;
             align-items: center;
         }
-
+        
         #quiz-container {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 700px;
-            width: 90%;
-            text-align: center;
+            background-color: rgba(22, 27, 34, 0.95);
+            padding: 20px;
+            border-radius: 15px;
             box-shadow: 0 0 15px #00ffc3;
+            max-width: 90%;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1s;
         }
-
-        h1, h2 {
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        h1,
+        h2 {
             color: #00ffc3;
+            margin: 8px 0;
         }
-
+        
+        .question {
+            margin: 20px 0;
+        }
+        
         .option {
+            padding: 10px;
+            margin: 5px 0;
             background-color: #21262d;
             border: 1px solid #00ffc3;
-            padding: 12px;
-            border-radius: 10px;
-            margin: 10px 0;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all .3s;
         }
-
+        
         .option:hover {
             background-color: #00ffc3;
-            color: black;
+            color: #000;
         }
-
+        
+        .correct {
+            background-color: #28a745 !important;
+            color: #fff;
+        }
+        
+        .incorrect {
+            background-color: #dc3545 !important;
+            color: #fff;
+        }
+        
         button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            font-weight: bold;
+            margin-top: 20px;
+            padding: 12px 24px;
             background-color: #00ffc3;
+            color: #000;
             border: none;
             border-radius: 10px;
             cursor: pointer;
+            font-weight: bold;
+            transition: all .3s;
         }
-
-        #result {
+        
+        #result,
+        #tips,
+        #ranking,
+        #difficulty-selection,
+        #name-input,
+        #timer {
             display: none;
         }
-
-        @media screen and (max-width: 600px) {
-            #quiz-container {
-                padding: 20px;
+        
+        ul {
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        #timer {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #ff8080;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
             }
-
-            h1 {
-                font-size: 24px;
+            .option {
+                font-size: 0.9rem;
             }
-
-            h2 {
-                font-size: 20px;
+            button {
+                width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
     <div id="quiz-container">
-        <h1>🧠 TechBrain</h1>
-        <h2>Engenharia Social</h2>
-        <p id="question-text">Carregando pergunta...</p>
-        <div id="options"></div>
+        <div id="name-input">
+            <h2>Digite seu nome:</h2>
+            <input type="text" id="username" placeholder="Seu nome" />
+            <button onclick="startDifficultySelection()">Continuar</button>
+        </div>
+        <div id="difficulty-selection">
+            <h2>Escolha a dificuldade</h2>
+            <button onclick="startQuiz('facil')">Fácil</button>
+            <button onclick="startQuiz('medio')">Médio</button>
+            <button onclick="startQuiz('dificil')">Difícil</button>
+        </div>
+        <div id="quiz">
+            <h1>🧠 TechBrain</h1>
+            <h2>Engenharia Social & Segurança Digital</h2>
+            <div id="timer"></div>
+            <p id="question-text" class="question"></p>
+            <div id="options"></div>
+        </div>
         <div id="result">
             <h2 id="score-text"></h2>
             <button onclick="location.reload()">Refazer Quiz</button>
         </div>
+        <div id="tips">
+            <h2>🛡 Dicas para não cair em golpes</h2>
+            <ul>
+                <li>Nunca forneça senhas por telefone, e-mail ou SMS.</li>
+                <li>Verifique o remetente antes de clicar em links.</li>
+                <li>Desconfie de ofertas boas demais para serem verdade.</li>
+                <li>Use autenticação em dois fatores (2FA).</li>
+                <li>Participe de treinamentos de segurança digital.</li>
+                <li>Confirme ligações suspeitas ligando para canais oficiais.</li>
+            </ul>
+        </div>
+        <div id="ranking">
+            <h2>Ranking</h2>
+            <ul id="ranking-list"></ul>
+        </div>
     </div>
-
+    <audio id="click-sound" src="https://www.myinstants.com/media/sounds/click.mp3"></audio>
+    <audio id="bg-music" src="https://www.fesliyanstudios.com/play-mp3/387" loop autoplay></audio>
     <script>
-        const questions = [
-            {
+        const backgrounds = ["bg-inicio.jpg", "2.png", "5.png", "6.png"];
+        const allQuestions = {
+            facil: [{
                 question: "O que é engenharia social?",
-                options: ["Engenharia de software", "Manipulação para obter dados", "Engenharia civil", "Hack de redes"],
+                options: ["Engenharia civil", "Manipulação psicológica para obter informações", "Sistema de criptografia", "Software de segurança"],
                 answer: 1
-            },
-            {
-                question: "O que é phishing?",
-                options: ["Pescar com rede", "Vírus de celular", "Golpe que rouba dados", "Antivírus gratuito"],
+            }, {
+                question: "O que é 'phishing'?",
+                options: ["Pescar em redes sociais", "Mensagem falsa para roubar dados", "Teste físico de segurança", "Antivírus famoso"],
+                answer: 1
+            }, {
+                question: "Objetivo da engenharia social?",
+                options: ["Roubar senhas", "Enganar pessoas para obter acesso", "Criar software", "Defender sistemas"],
+                answer: 1
+            }, {
+                question: "Exemplo de golpe?",
+                options: ["Engenharia de redes", "Ligação fingindo ser do banco", "Atualização de software", "Troca de hardware"],
+                answer: 1
+            }],
+            medio: [{
+                question: "O que é 'pretexting'?",
+                options: ["Ataque físico", "História falsa para obter dados", "Vírus em pendrive", "Invadir Wi‑Fi"],
+                answer: 1
+            }, {
+                question: "Alvos da engenharia social?",
+                options: ["Sistemas automatizados", "Pessoas", "Servidores", "Cabos de rede"],
+                answer: 1
+            }, {
+                question: "O que é 'baiting'?",
+                options: ["Clickbait", "USB infectado deixado à toa", "Link de propaganda", "Senha fraca"],
+                answer: 1
+            }],
+            dificil: [{
+                question: "Alvo do 'spear phishing'?",
+                options: ["Grupo aleatório", "Crianças", "Alvo específico com informações", "Usuários Linux"],
                 answer: 2
-            }
-        ];
+            }, {
+                question: "Como evitar engenharia social?",
+                options: ["Ignorar e‑mails", "Educação e conscientização", "Comprar antivírus", "Trocar de celular"],
+                answer: 1
+            }, {
+                question: "Qual não é método?",
+                options: ["Phishing", "Pretexting", "Backup", "Baiting"],
+                answer: 2
+            }]
+        };
+        let selectedQuestions = [],
+            currentQuestion = 0,
+            score = 0,
+            username = "",
+            timer, timerCount = 15;
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options');
+        const result = document.getElementById('result');
+        const scoreText = document.getElementById('score-text');
+        const tips = document.getElementById('tips');
+        const quiz = document.getElementById('quiz');
+        const clickSound = document.getElementById('click-sound');
+        const timerDiv = document.getElementById('timer');
 
-        let current = 0;
-        let score = 0;
-        const questionText = document.getElementById("question-text");
-        const optionsContainer = document.getElementById("options");
-        const resultContainer = document.getElementById("result");
-        const scoreText = document.getElementById("score-text");
+        document.getElementById('name-input').style.display = 'block';
+        document.body.style.backgroundImage = `url('${backgrounds[0]}')`;
+
+        function startDifficultySelection() {
+            username = document.getElementById("username").value.trim();
+            if (!username) return alert("Digite seu nome!");
+            document.getElementById('name-input').style.display = 'none';
+            document.getElementById('difficulty-selection').style.display = 'block';
+        }
+
+        function startQuiz(nivel) {
+            selectedQuestions = allQuestions[nivel];
+            document.getElementById('difficulty-selection').style.display = 'none';
+            quiz.style.display = 'block';
+            currentQuestion = 0;
+            score = 0;
+            loadQuestion();
+        }
 
         function loadQuestion() {
-            const q = questions[current];
-            questionText.textContent = q.question;
+            clearInterval(timer);
+            timerCount = 15;
+            timerDiv.style.display = 'block';
+            timerDiv.textContent = `Tempo: ${timerCount}s`;
+            timer = setInterval(() => {
+                timerCount--;
+                timerDiv.textContent = `Tempo: ${timerCount}s`;
+                if (timerCount === 0) {
+                    clearInterval(timer);
+                    nextQuestion(false);
+                }
+            }, 1000);
+
+            const q = selectedQuestions[currentQuestion];
+            document.body.style.backgroundImage = `url('${backgrounds[(currentQuestion+1)%backgrounds.length]}')`;
+            questionText.textContent = `Pergunta ${currentQuestion+1}/${selectedQuestions.length}: ${q.question}`;
             optionsContainer.innerHTML = "";
-            q.options.forEach((opt, index) => {
-                const div = document.createElement("div");
-                div.className = "option";
-                div.textContent = opt;
-                div.onclick = () => checkAnswer(index);
-                optionsContainer.appendChild(div);
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('div');
+                btn.textContent = opt;
+                btn.classList.add('option');
+                btn.onclick = () => selectAnswer(i, btn);
+                optionsContainer.appendChild(btn);
             });
         }
 
-        function checkAnswer(i) {
-            if (i === questions[current].answer) {
-                score++;
-            }
-            current++;
-            if (current < questions.length) {
-                loadQuestion();
-            } else {
-                showResult();
-            }
+        function selectAnswer(selected, element) {
+            clearInterval(timer);
+            clickSound.play();
+            const correct = selected === selectedQuestions[currentQuestion].answer;
+            element.classList.add(correct ? 'correct' : 'incorrect');
+            setTimeout(() => nextQuestion(correct), 1000);
+        }
+
+        function nextQuestion(correct) {
+            if (correct) score++;
+            currentQuestion++;
+            if (currentQuestion < selectedQuestions.length) loadQuestion();
+            else showResult();
         }
 
         function showResult() {
-            questionText.style.display = "none";
-            optionsContainer.style.display = "none";
-            resultContainer.style.display = "block";
-            scoreText.textContent = `Você acertou ${score} de ${questions.length} perguntas.`;
+            quiz.style.display = 'none';
+            result.style.display = 'block';
+            tips.style.display = 'block';
+            scoreText.textContent = `${username}, você acertou ${score} de ${selectedQuestions.length} perguntas.`;
+            addToRanking();
         }
 
-        loadQuestion();
+        function addToRanking() {
+            document.getElementById("ranking").style.display = 'block';
+            const list = document.getElementById("ranking-list");
+            const li = document.createElement("li");
+            li.textContent = `${username} - ${score} pontos`;
+            list.appendChild(li);
+            const saved = JSON.parse(localStorage.getItem("ranking") || "[]");
+            saved.push({
+                name: username,
+                score
+            });
+            saved.sort((a, b) => b.score - a.score);
+            localStorage.setItem("ranking", JSON.stringify(saved));
+        }
+
+        window.onload = () => {
+            const saved = JSON.parse(localStorage.getItem("ranking") || "[]");
+            const list = document.getElementById("ranking-list");
+            saved.forEach(p => {
+                const li = document.createElement("li");
+                li.textContent = `${p.name} - ${p.score} pontos`;
+                list.appendChild(li);
+            });
+        };
     </script>
 </body>
+
 </html>
