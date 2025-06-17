@@ -1,326 +1,629 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TechBrain: Engenharia Social & Segurança</title>
-    <style>
-         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #fafdff;
-            background-image: url('1.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        #quiz-container {
-            background-color: rgba(22, 27, 34, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 15px #00ffc3;
-            max-width: 90%;
-            width: 100%;
-            text-align: center;
-            animation: fadeIn 1s;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        h1,
-        h2 {
-            color: #00ffc3;
-            margin: 8px 0;
-        }
-        
-        .question {
-            margin: 20px 0;
-        }
-        
-        .option {
-            padding: 10px;
-            margin: 5px 0;
-            background-color: #21262d;
-            border: 1px solid #00ffc3;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all .3s;
-        }
-        
-        .option:hover {
-            background-color: #00ffc3;
-            color: #000;
-        }
-        
-        .correct {
-            background-color: #28a745 !important;
-            color: #fff;
-        }
-        
-        .incorrect {
-            background-color: #dc3545 !important;
-            color: #fff;
-        }
-        
-        button {
-            margin-top: 20px;
-            padding: 12px 24px;
-            background-color: #00ffc3;
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all .3s;
-        }
-        
-        #result,
-        #tips,
-        #ranking,
-        #difficulty-selection,
-        #name-input,
-        #timer {
-            display: none;
-        }
-        
-        ul {
-            text-align: left;
-            padding-left: 20px;
-        }
-        
-        #timer {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #ff8080;
-        }
-        
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            .option {
-                font-size: 0.9rem;
-            }
-            button {
-                width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TechBrain: Quiz Interativo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      box-shadow: 0 0 15px #000;
+      text-align: center;
+      position: relative;
+      padding: 20px;
+    }
+
+    header h1 {
+      font-size: 2.2em;
+      margin-bottom: 15px;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      user-select: none;
+    }
+
+    .screen {
+      display: none;
+    }
+    .screen.active {
+      display: block;
+    }
+
+    #answers {
+      list-style: none;
+      margin: 20px 0;
+      padding: 0;
+      text-align: left;
+    }
+
+    #answers li {
+      background: #222;
+      margin: 8px 0;
+      padding: 12px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      border: 2px solid transparent;
+      font-size: 1.1em;
+    }
+
+    #answers li:hover {
+      background: #333;
+      transform: scale(1.03);
+    }
+
+    #answers li.selected {
+      background: #2575fc;
+      border-color: #6a11cb;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    #answers li.correct {
+      background: #4caf50;
+      border-color: #388e3c;
+      color: #fff;
+      cursor: default;
+      transform: none;
+    }
+
+    #answers li.wrong {
+      background: #e53935;
+      border-color: #b71c1c;
+      color: #fff;
+      cursor: default;
+      transform: none;
+    }
+
+    button {
+      background: linear-gradient(to right, #2575fc, #6a11cb);
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 20px;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin-top: 15px;
+      user-select: none;
+      transition: background 0.3s;
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: #444;
+      border-radius: 10px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      border-radius: 10px;
+      transition: width 0.3s ease-in-out;
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 15px;
+      background: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+      box-shadow: inset 0 0 10px #000;
+    }
+
+    #time-fill {
+      width: 100%;
+      height: 100%;
+      background: limegreen;
+      transition: width 1s linear, background-color 0.5s;
+    }
+
+    #time-warning {
+      color: #ff4444;
+      font-weight: bold;
+      margin-top: 10px;
+      animation: pulse 1s infinite;
+      user-select: none;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    #mascot {
+      position: absolute;
+      bottom: -20px;
+      right: -10px;
+      font-size: 40px;
+      user-select: none;
+    }
+  </style>
 </head>
-
 <body>
-    <div id="quiz-container">
-        <div id="name-input">
-            <h2>Digite seu nome:</h2>
-            <input type="text" id="username" placeholder="Seu nome" />
-            <button onclick="startDifficultySelection()">Continuar</button>
+  <div class="app-container">
+    <header>
+      <h1>🧠 TechBrain</h1>
+      <div class="status">
+        <div id="lives">❤❤❤</div>
+        <div id="timer">⏱ 30s</div>
+        <div id="score">Pontos: 0</div>
+      </div>
+      <div class="timer-bar">
+        <div id="time-fill"></div>
+      </div>
+      <p id="time-warning" class="hidden">⚠ Tempo está acabando!</p>
+    </header>
+
+    <main>
+      <section id="start-screen" class="screen active">
+        <h2>Bem-vindo ao TechBrain!</h2>
+        <p>Escolha a categoria e dificuldade para começar:</p>
+        <select id="category">
+          <option value="programacao">Programação</option>
+          <option value="informatica">Informática Básica</option>
+        </select>
+        <select id="difficulty">
+          <option value="facil">Fácil</option>
+          <option value="medio">Médio</option>
+          <option value="dificil">Difícil</option>
+        </select>
+        <button id="start-btn">Iniciar Quiz</button>
+      </section>
+
+      <section id="quiz-screen" class="screen">
+        <div id="question-box">
+          <h2 id="question"></h2>
+          <ul id="answers"></ul>
         </div>
-        <div id="difficulty-selection">
-            <h2>Escolha a dificuldade</h2>
-            <button onclick="startQuiz('facil')">Fácil</button>
-            <button onclick="startQuiz('medio')">Médio</button>
-            <button onclick="startQuiz('dificil')">Difícil</button>
+        <button id="next-btn" disabled>Próxima</button>
+        <div id="explanation" class="hidden"></div>
+        <div class="progress-bar">
+          <div id="progress"></div>
         </div>
-        <div id="quiz">
-            <h1>🧠 TechBrain</h1>
-            <h2>Engenharia Social & Segurança Digital</h2>
-            <div id="timer"></div>
-            <p id="question-text" class="question"></p>
-            <div id="options"></div>
-        </div>
-        <div id="result">
-            <h2 id="score-text"></h2>
-            <button onclick="location.reload()">Refazer Quiz</button>
-        </div>
-        <div id="tips">
-            <h2>🛡 Dicas para não cair em golpes</h2>
-            <ul>
-                <li>Nunca forneça senhas por telefone, e-mail ou SMS.</li>
-                <li>Verifique o remetente antes de clicar em links.</li>
-                <li>Desconfie de ofertas boas demais para serem verdade.</li>
-                <li>Use autenticação em dois fatores (2FA).</li>
-                <li>Participe de treinamentos de segurança digital.</li>
-                <li>Confirme ligações suspeitas ligando para canais oficiais.</li>
-            </ul>
-        </div>
-        <div id="ranking">
-            <h2>Ranking</h2>
-            <ul id="ranking-list"></ul>
-        </div>
-    </div>
-    <audio id="click-sound" src="https://www.myinstants.com/media/sounds/click.mp3"></audio>
-    <audio id="bg-music" src="https://www.fesliyanstudios.com/play-mp3/387" loop autoplay></audio>
-    <script>
-        const backgrounds = ["bg-inicio.jpg", "2.png", "5.png", "6.png"];
-        const allQuestions = {
-            facil: [{
-                question: "O que é engenharia social?",
-                options: ["Engenharia civil", "Manipulação psicológica para obter informações", "Sistema de criptografia", "Software de segurança"],
-                answer: 1
-            }, {
-                question: "O que é 'phishing'?",
-                options: ["Pescar em redes sociais", "Mensagem falsa para roubar dados", "Teste físico de segurança", "Antivírus famoso"],
-                answer: 1
-            }, {
-                question: "Objetivo da engenharia social?",
-                options: ["Roubar senhas", "Enganar pessoas para obter acesso", "Criar software", "Defender sistemas"],
-                answer: 1
-            }, {
-                question: "Exemplo de golpe?",
-                options: ["Engenharia de redes", "Ligação fingindo ser do banco", "Atualização de software", "Troca de hardware"],
-                answer: 1
-            }],
-            medio: [{
-                question: "O que é 'pretexting'?",
-                options: ["Ataque físico", "História falsa para obter dados", "Vírus em pendrive", "Invadir Wi‑Fi"],
-                answer: 1
-            }, {
-                question: "Alvos da engenharia social?",
-                options: ["Sistemas automatizados", "Pessoas", "Servidores", "Cabos de rede"],
-                answer: 1
-            }, {
-                question: "O que é 'baiting'?",
-                options: ["Clickbait", "USB infectado deixado à toa", "Link de propaganda", "Senha fraca"],
-                answer: 1
-            }],
-            dificil: [{
-                question: "Alvo do 'spear phishing'?",
-                options: ["Grupo aleatório", "Crianças", "Alvo específico com informações", "Usuários Linux"],
-                answer: 2
-            }, {
-                question: "Como evitar engenharia social?",
-                options: ["Ignorar e‑mails", "Educação e conscientização", "Comprar antivírus", "Trocar de celular"],
-                answer: 1
-            }, {
-                question: "Qual não é método?",
-                options: ["Phishing", "Pretexting", "Backup", "Baiting"],
-                answer: 2
-            }]
+      </section>
+
+      <section id="end-screen" class="screen">
+        <h2>🏁 Quiz Finalizado!</h2>
+        <p id="final-score"></p>
+        <p id="ranking"></p>
+        <button id="restart-btn">Jogar Novamente</button>
+      </section>
+    </main>
+
+    <div id="mascot" class="mascot">😐</div>
+    <audio id="tense-sound" src="https://cdn.pixabay.com/download/audio/2022/03/16/audio_a8324aa01e.mp3?filename=suspense-3-21897.mp3"></audio>
+  </div>
+
+<script>
+  const startBtn = document.getElementById('start-btn');
+  const restartBtn = document.getElementById('restart-btn');
+  const startScreen = document.getElementById('start-screen');
+  const quizScreen = document.getElementById('quiz-screen');
+  const endScreen = document.getElementById('end-screen');
+
+  const questionEl = document.getElementById('question');
+  const answersEl = document.getElementById('answers');
+  const nextBtn = document.getElementById('next-btn');
+  const explanationEl = document.getElementById('explanation');
+
+  const livesEl = document.getElementById('lives');
+  const timerEl = document.getElementById('timer');
+  const timeFillEl = document.getElementById('time-fill');
+  const timeWarningEl = document.getElementById('time-warning');
+  const scoreEl = document.getElementById('score');
+  const mascotEl = document.getElementById('mascot');
+  const tenseSound = document.getElementById('tense-sound');
+
+  let questions = {
+    programacao: {
+      facil: [
+        {
+          question: "Qual é a linguagem de marcação usada para criar páginas web?",
+          answers: [
+            { text: "CSS", correct: false },
+            { text: "JavaScript", correct: false },
+            { text: "HTML", correct: true },
+            { text: "Python", correct: false }
+          ],
+          explanation: "HTML é a linguagem usada para estruturar páginas web."
+        },
+        {
+          question: "Qual linguagem é usada para estilizar páginas web?",
+          answers: [
+            { text: "HTML", correct: false },
+            { text: "CSS", correct: true },
+            { text: "Python", correct: false },
+            { text: "JavaScript", correct: false }
+          ],
+          explanation: "CSS é usada para estilizar páginas web."
+        },
+        {
+          question: "Qual linguagem adiciona interatividade às páginas web?",
+          answers: [
+            { text: "JavaScript", correct: true },
+            { text: "HTML", correct: false },
+            { text: "CSS", correct: false },
+            { text: "PHP", correct: false }
+          ],
+          explanation: "JavaScript adiciona interatividade às páginas."
+        }
+      ],
+      medio: [
+        {
+          question: "O que significa 'API' em programação?",
+          answers: [
+            { text: "Application Programming Interface", correct: true },
+            { text: "Automated Programming Internet", correct: false },
+            { text: "Applied Program Instruction", correct: false },
+            { text: "Active Programming Interface", correct: false }
+          ],
+          explanation: "API significa Application Programming Interface."
+        },
+        {
+          question: "Qual dos seguintes é um banco de dados relacional?",
+          answers: [
+            { text: "MongoDB", correct: false },
+            { text: "MySQL", correct: true },
+            { text: "Redis", correct: false },
+            { text: "Cassandra", correct: false }
+          ],
+          explanation: "MySQL é um banco de dados relacional."
+        }
+      ],
+      dificil: [
+        {
+          question: "O que é 'closure' em JavaScript?",
+          answers: [
+            { text: "Uma função com acesso ao escopo léxico externo", correct: true },
+            { text: "Um erro de compilação", correct: false },
+            { text: "Um tipo de dado", correct: false },
+            { text: "Um evento DOM", correct: false }
+          ],
+          explanation: "Closure é uma função que lembra seu escopo léxico."
+        }
+      ]
+    },
+    informatica: {
+      facil: [
+        {
+          question: "O que significa 'CPU' em informática?",
+          answers: [
+            { text: "Central Processing Unit", correct: true },
+            { text: "Computer Personal Unit", correct: false },
+            { text: "Central Power Unit", correct: false },
+            { text: "Computer Processing Unit", correct: false }
+          ],
+          explanation: "CPU significa Unidade Central de Processamento."
+        },
+        {
+          question: "Qual sistema operacional é da Microsoft?",
+          answers: [
+            { text: "Linux", correct: false },
+            { text: "MacOS", correct: false },
+            { text: "Windows", correct: true },
+            { text: "Unix", correct: false }
+          ],
+          explanation: "Windows é sistema operacional da Microsoft."
+        }
+      ],
+      medio: [
+        {
+          question: "Qual a função da memória RAM?",
+          answers: [
+            { text: "Armazenar dados permanentemente", correct: false },
+            { text: "Armazenar dados temporariamente para acesso rápido", correct: true },
+            { text: "Processar dados", correct: false },
+            { text: "Gerenciar conexões de rede", correct: false }
+          ],
+          explanation: "RAM armazena dados temporariamente para acesso rápido."
+        }
+      ],
+      dificil: [
+        {
+          question: "O que é overclocking?",
+          answers: [
+            { text: "Aumento da velocidade do processador além do padrão", correct: true },
+            { text: "Refrigeração líquida do PC", correct: false },
+            { text: "Atualização do sistema operacional", correct: false },
+            { text: "Instalação de software antivírus", correct: false }
+          ],
+          explanation: "Overclocking é acelerar o processador além do padrão."
+        }
+      ]
+    }
+  };
+
+  let currentCategory = null;
+  let currentDifficulty = null;
+  let currentQuestions = [];
+  let currentIndex = 0;
+  let score = 0;
+  let lives = 3;
+  let timerDuration = 30; // segundos por pergunta
+  let timeLeft = timerDuration;
+  let timerInterval = null;
+  let selectedAnswerIndex = null;
+
+  function startQuiz() {
+    currentCategory = document.getElementById('category').value;
+    currentDifficulty = document.getElementById('difficulty').value;
+    currentQuestions = questions[currentCategory][currentDifficulty];
+    currentIndex = 0;
+    score = 0;
+    lives = 3;
+    timeLeft = timerDuration;
+    selectedAnswerIndex = null;
+
+    updateLives();
+    updateScore();
+    startScreen.classList.remove('active');
+    endScreen.classList.remove('active');
+    quizScreen.classList.add('active');
+
+    showQuestion();
+    startTimer();
+    mascotEl.textContent = "😐";
+  }
+
+  function showQuestion() {
+    clearInterval(timerInterval);
+    timeLeft = timerDuration;
+    updateTimerUI();
+
+    const question = currentQuestions[currentIndex];
+    questionEl.textContent = question.question;
+    explanationEl.textContent = "";
+    explanationEl.classList.add('hidden');
+    nextBtn.disabled = true;
+    selectedAnswerIndex = null;
+
+    // Limpar respostas anteriores
+    answersEl.innerHTML = '';
+
+    question.answers.forEach((answer, idx) => {
+      const li = document.createElement('li');
+      li.textContent = answer.text;
+      li.dataset.index = idx;
+      li.addEventListener('click', () => selectAnswer(idx));
+      answersEl.appendChild(li);
+    });
+
+    updateProgress();
+    startTimer();
+  }
+
+  function selectAnswer(idx) {
+    if (selectedAnswerIndex !== null) return; // só permite selecionar uma vez
+
+    selectedAnswerIndex = idx;
+
+    const lis = answersEl.querySelectorAll('li');
+    lis.forEach((li, i) => {
+      li.classList.remove('selected');
+      li.classList.remove('correct');
+      li.classList.remove('wrong');
+      li.style.cursor = 'default';
+    });
+
+    lis[idx].classList.add('selected');
+
+    nextBtn.disabled = false;
+  }
+
+  function showAnswerAndExplanation() {
+    clearInterval(timerInterval);
+
+    const question = currentQuestions[currentIndex];
+    const lis = answersEl.querySelectorAll('li');
+
+    lis.forEach((li, i) => {
+      li.style.cursor = 'default';
+      if (question.answers[i].correct) {
+        li.classList.add('correct');
+      }
+      if (i === selectedAnswerIndex && !question.answers[i].correct) {
+        li.classList.add('wrong');
+      }
+    });
+
+    explanationEl.textContent = question.explanation;
+    explanationEl.classList.remove('hidden');
+
+    // Atualiza score e vidas
+    if (selectedAnswerIndex !== null && question.answers[selectedAnswerIndex].correct) {
+      score += 10;
+      mascotEl.textContent = "😃";
+    } else {
+      lives--;
+      mascotEl.textContent = "😞";
+      updateLives();
+    }
+    updateScore();
+
+    nextBtn.disabled = false;
+  }
+
+  function nextQuestion() {
+    // Só pode avançar se já tiver escolhido (botão habilitado)
+    if (nextBtn.disabled) return;
+
+    showAnswerAndExplanation();
+
+    nextBtn.textContent = "Continuar";
+
+    nextBtn.onclick = () => {
+      currentIndex++;
+      if (currentIndex >= currentQuestions.length || lives <= 0) {
+        finishQuiz();
+      } else {
+        nextBtn.textContent = "Próxima";
+        showQuestion();
+      }
+    }
+  }
+
+  function finishQuiz() {
+    clearInterval(timerInterval);
+    quizScreen.classList.remove('active');
+    endScreen.classList.add('active');
+    document.getElementById('final-score').textContent = Sua pontuação: ${score};
+    document.getElementById('ranking').textContent = getRanking();
+  }
+
+  function getRanking() {
+    if (score >= currentQuestions.length * 10) return "🏆 Excelente!";
+    if (score >= currentQuestions.length * 7) return "👍 Bom trabalho!";
+    if (score >= currentQuestions.length * 4) return "🙂 Pode melhorar!";
+    return "😞 Tente novamente!";
+  }
+
+  function updateLives() {
+    livesEl.textContent = "❤".repeat(lives);
+    if (lives <= 0) {
+      finishQuiz();
+    }
+  }
+
+  function updateScore() {
+    scoreEl.textContent = Pontos: ${score};
+  }
+
+  function updateProgress() {
+    const progressPercent = ((currentIndex) / currentQuestions.length) * 100;
+    document.getElementById('progress').style.width = ${progressPercent}%;
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = timerDuration;
+    updateTimerUI();
+    timeWarningEl.classList.add('hidden');
+    tenseSound.pause();
+    tenseSound.currentTime = 0;
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerUI();
+
+      if (timeLeft <= 10) {
+        timeFillEl.style.backgroundColor = 'orange';
+        timeWarningEl.classList.remove('hidden');
+        if (timeLeft === 10) {
+          tenseSound.play();
+          mascotEl.textContent = "😰";
+        }
+      }
+
+      if (timeLeft <= 5) {
+        timeFillEl.style.backgroundColor = 'red';
+        mascotEl.textContent = "😱";
+      }
+
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timeWarningEl.classList.add('hidden');
+        tenseSound.pause();
+        tenseSound.currentTime = 0;
+        mascotEl.textContent = "😞";
+
+        // Sem resposta no tempo -> vida perdida
+        lives--;
+        updateLives();
+
+        // Mostrar resposta correta
+        showAnswerAndExplanation();
+
+        // Desabilita seleção ao estourar o tempo
+        nextBtn.disabled = false;
+
+        // Remove evento antigo para não duplicar
+        nextBtn.onclick = () => {
+          currentIndex++;
+          if (currentIndex >= currentQuestions.length || lives <= 0) {
+            finishQuiz();
+          } else {
+            nextBtn.textContent = "Próxima";
+            showQuestion();
+          }
         };
-        let selectedQuestions = [],
-            currentQuestion = 0,
-            score = 0,
-            username = "",
-            timer, timerCount = 15;
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options');
-        const result = document.getElementById('result');
-        const scoreText = document.getElementById('score-text');
-        const tips = document.getElementById('tips');
-        const quiz = document.getElementById('quiz');
-        const clickSound = document.getElementById('click-sound');
-        const timerDiv = document.getElementById('timer');
+      }
+    }, 1000);
+  }
 
-        document.getElementById('name-input').style.display = 'block';
-        document.body.style.backgroundImage = `url('${backgrounds[0]}')`;
+  function updateTimerUI() {
+    timerEl.textContent = ⏱ ${timeLeft}s;
+    const percent = (timeLeft / timerDuration) * 100;
+    timeFillEl.style.width = ${percent}%;
+    if (timeLeft > 10) {
+      timeFillEl.style.backgroundColor = 'limegreen';
+      timeWarningEl.classList.add('hidden');
+    }
+  }
 
-        function startDifficultySelection() {
-            username = document.getElementById("username").value.trim();
-            if (!username) return alert("Digite seu nome!");
-            document.getElementById('name-input').style.display = 'none';
-            document.getElementById('difficulty-selection').style.display = 'block';
-        }
+  // Eventos dos botões
+  startBtn.addEventListener('click', startQuiz);
 
-        function startQuiz(nivel) {
-            selectedQuestions = allQuestions[nivel];
-            document.getElementById('difficulty-selection').style.display = 'none';
-            quiz.style.display = 'block';
-            currentQuestion = 0;
-            score = 0;
-            loadQuestion();
-        }
+  nextBtn.addEventListener('click', () => {
+    if (nextBtn.textContent === 'Próxima') {
+      if (selectedAnswerIndex === null) {
+        alert('Por favor, selecione uma resposta antes de continuar!');
+        return;
+      }
+      showAnswerAndExplanation();
+      nextBtn.textContent = 'Continuar';
+    } else if (nextBtn.textContent === 'Continuar') {
+      currentIndex++;
+      if (currentIndex >= currentQuestions.length || lives <= 0) {
+        finishQuiz();
+      } else {
+        showQuestion();
+        nextBtn.textContent = 'Próxima';
+        nextBtn.disabled = true;
+      }
+    }
+  });
 
-        function loadQuestion() {
-            clearInterval(timer);
-            timerCount = 15;
-            timerDiv.style.display = 'block';
-            timerDiv.textContent = `Tempo: ${timerCount}s`;
-            timer = setInterval(() => {
-                timerCount--;
-                timerDiv.textContent = `Tempo: ${timerCount}s`;
-                if (timerCount === 0) {
-                    clearInterval(timer);
-                    nextQuestion(false);
-                }
-            }, 1000);
-
-            const q = selectedQuestions[currentQuestion];
-            document.body.style.backgroundImage = `url('${backgrounds[(currentQuestion+1)%backgrounds.length]}')`;
-            questionText.textContent = `Pergunta ${currentQuestion+1}/${selectedQuestions.length}: ${q.question}`;
-            optionsContainer.innerHTML = "";
-            q.options.forEach((opt, i) => {
-                const btn = document.createElement('div');
-                btn.textContent = opt;
-                btn.classList.add('option');
-                btn.onclick = () => selectAnswer(i, btn);
-                optionsContainer.appendChild(btn);
-            });
-        }
-
-        function selectAnswer(selected, element) {
-            clearInterval(timer);
-            clickSound.play();
-            const correct = selected === selectedQuestions[currentQuestion].answer;
-            element.classList.add(correct ? 'correct' : 'incorrect');
-            setTimeout(() => nextQuestion(correct), 1000);
-        }
-
-        function nextQuestion(correct) {
-            if (correct) score++;
-            currentQuestion++;
-            if (currentQuestion < selectedQuestions.length) loadQuestion();
-            else showResult();
-        }
-
-        function showResult() {
-            quiz.style.display = 'none';
-            result.style.display = 'block';
-            tips.style.display = 'block';
-            scoreText.textContent = `${username}, você acertou ${score} de ${selectedQuestions.length} perguntas.`;
-            addToRanking();
-        }
-
-        function addToRanking() {
-            document.getElementById("ranking").style.display = 'block';
-            const list = document.getElementById("ranking-list");
-            const li = document.createElement("li");
-            li.textContent = `${username} - ${score} pontos`;
-            list.appendChild(li);
-            const saved = JSON.parse(localStorage.getItem("ranking") || "[]");
-            saved.push({
-                name: username,
-                score
-            });
-            saved.sort((a, b) => b.score - a.score);
-            localStorage.setItem("ranking", JSON.stringify(saved));
-        }
-
-        window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem("ranking") || "[]");
-            const list = document.getElementById("ranking-list");
-            saved.forEach(p => {
-                const li = document.createElement("li");
-                li.textContent = `${p.name} - ${p.score} pontos`;
-                list.appendChild(li);
-            });
-        };
-    </script>
+  restartBtn.addEventListener('click', () => {
+    endScreen.classList.remove('active');
+    startScreen.classList.add('active');
+    mascotEl.textContent = "😐";
+  });
+</script>
 </body>
-
 </html>
