@@ -1,388 +1,441 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TechQuiz Pro - Quiz de Tecnologia</title>
-
-  <!-- Ícone da aba -->
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2913/2913460.png" type="image/png" />
-
-  <style>
-    /* Reset básico */
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
-      color: #eee;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 60px;
-      background-color: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-      z-index: 100;
-    }
-    header h1 {
-      font-size: 1.5rem;
-      user-select: none;
-    }
-    header button {
-      background: #00c9ff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-weight: bold;
-      color: black;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    header button:hover {
-      background: #00a3cc;
-    }
-
-    main {
-      margin-top: 80px;
-      width: 100%;
-      max-width: 600px;
-      padding: 20px;
-    }
-    .container {
-      background: rgba(0,0,0,0.85);
-      border-radius: 20px;
-      padding: 25px 30px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.6);
-      text-align: center;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    select {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0 20px 0;
-      border-radius: 12px;
-      border: none;
-      font-size: 1rem;
-      outline: none;
-      transition: box-shadow 0.3s ease;
-    }
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    select:focus {
-      box-shadow: 0 0 10px #00c9ff;
-    }
-
-    label {
-      font-weight: 600;
-      margin-top: 10px;
-      display: block;
-      text-align: left;
-      font-size: 1rem;
-      user-select: none;
-    }
-
-    button {
-      background: #00c9ff;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 15px;
-      font-weight: bold;
-      color: black;
-      cursor: pointer;
-      font-size: 1.1rem;
-      margin-top: 10px;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      user-select: none;
-    }
-    button:hover:not(:disabled) {
-      background: #00a3cc;
-      transform: scale(1.05);
-    }
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .buttons-row {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 10px;
-    }
-
-    #quiz-screen .progress-bar {
-      width: 100%;
-      height: 14px;
-      background: #222;
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 15px;
-      box-shadow: inset 0 0 6px #000;
-    }
-    #progress-fill {
-      height: 100%;
-      width: 0%;
-      background: #00c9ff;
-      transition: width 0.5s ease;
-    }
-
-    #quiz-screen .quiz-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      user-select: none;
-    }
-
-    #timer {
-      background: #111;
-      padding: 6px 14px;
-      border-radius: 12px;
-      font-family: monospace;
-      letter-spacing: 2px;
-      color: #00c9ff;
-      font-weight: bold;
-    }
-
-    #question-text {
-      font-size: 1.3rem;
-      margin-bottom: 20px;
-      user-select: none;
-    }
-
-    #answers {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    #answers label {
-      background: #222;
-      padding: 14px 20px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      user-select: none;
-      transition: background-color 0.3s ease;
-      border: 2px solid transparent;
-    }
-    #answers input[type="radio"] {
-      display: none;
-    }
-    #answers input[type="radio"]:checked + label {
-      background: #00c9ff;
-      color: black;
-      font-weight: 700;
-      border: 2px solid #00a3cc;
-    }
-    #answers label.correct {
-      background-color: #2ecc71 !important; /* verde */
-      color: white;
-      font-weight: 700;
-      border: 2px solid #27ae60 !important;
-    }
-    #answers label.wrong {
-      background-color: #e74c3c !important; /* vermelho */
-      color: white;
-      font-weight: 700;
-      border: 2px solid #c0392b !important;
-    }
-
-    #feedback {
-      margin-top: 15px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      min-height: 26px;
-      user-select: none;
-    }
-
-    #end-screen p {
-      font-size: 1.3rem;
-      margin: 15px 0;
-    }
-
-    /* Modal ajuda */
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right:0; bottom: 0;
-      background: rgba(0,0,0,0.85);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      user-select: none;
-    }
-    .modal-content {
-      background: #111;
-      padding: 30px 40px;
-      border-radius: 25px;
-      max-width: 450px;
-      width: 90%;
-      color: #eee;
-      box-shadow: 0 0 20px #00c9ff;
-      text-align: left;
-    }
-    .modal-content h3 {
-      margin-bottom: 20px;
-      font-weight: 700;
-      font-size: 1.4rem;
-      text-align: center;
-    }
-    .modal-content ul {
-      margin-left: 15px;
-      margin-bottom: 25px;
-    }
-    .modal-content ul li {
-      margin-bottom: 10px;
-      font-size: 1.05rem;
-    }
-    .modal-content button {
-      display: block;
-      margin: 0 auto;
-      background: #00c9ff;
-      color: black;
-      font-weight: 700;
-      padding: 10px 25px;
-      border-radius: 18px;
-      border: none;
-      cursor: pointer;
-      font-size: 1.1rem;
-      user-select: none;
-      transition: background-color 0.3s ease;
-    }
-    .modal-content button:hover {
-      background: #00a3cc;
-    }
-
-    /* Footer */
-    footer {
-      margin: 40px 0 20px 0;
-      font-size: 0.9rem;
-      color: #aaa;
-      user-select: none;
-    }
-
-    /* Responsividade */
-    @media (max-width: 400px) {
-      header h1 {
-        font-size: 1.2rem;
-      }
-      button {
-        padding: 10px 14px;
-        font-size: 1rem;
-      }
-      .modal-content {
-        padding: 20px 25px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Gamer - TechBrain</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        * {
+            box-sizing: border-box;
+        }
+        
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Press Start 2P', cursive;
+            background: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #00ff00;
+            text-shadow: 0 0 5px #0f0;
+        }
+        
+        .overlay {
+            background: rgba(0, 0, 0, 0.85);
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 1s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        input[type=text] {
+            padding: 10px;
+            width: 280px;
+            font-size: 1rem;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            outline: none;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        input[type=text]::placeholder {
+            color: #0f0;
+        }
+        
+        button {
+            cursor: pointer;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            transition: 0.3s;
+        }
+        
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        #quiz-container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 20px;
+            border-radius: 8px;
+            animation: slideIn 0.7s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        #question {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .option-btn {
+            margin: 8px 0;
+            padding: 10px;
+            font-size: 1rem;
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .option-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        .option-btn.correct {
+            background: #0f0;
+            color: #000;
+            border-color: #0f0;
+        }
+        
+        .option-btn.wrong {
+            background: #f00;
+            color: #fff;
+            border-color: #f00;
+        }
+        
+        #scoreboard {
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+        
+        #level-selection {
+            margin-bottom: 20px;
+        }
+        
+        #ranking {
+            margin-top: 30px;
+            max-width: 700px;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        #ranking h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        #ranking-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        #ranking-list li {
+            font-size: 1rem;
+            border-bottom: 1px solid #00ff00;
+            padding: 6px 0;
+        }
+        
+        @media(max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            #question {
+                font-size: 1rem;
+            }
+            button,
+            .option-btn,
+            input[type=text] {
+                font-size: 0.9rem;
+                padding: 8px;
+                width: 100%;
+            }
+        }
+    </style>
 </head>
+
 <body>
-
-  <header>
-    <h1>🧠 TechQuiz Pro</h1>
-    <button id="btn-restart-header" title="Reiniciar quiz">🔄 Reiniciar</button>
-  </header>
-
-  <main>
-
-    <!-- Tela inicial -->
-    <section class="container" id="start-screen">
-      <h2>Bem-vindo(a) ao TechQuiz Pro!</h2>
-      <p>Teste seus conhecimentos em tecnologia e progrida nos níveis.</p>
-
-      <label for="username">Digite seu nome (opcional):</label>
-      <input type="text" id="username" placeholder="Seu nome" maxlength="20" autocomplete="off" />
-
-      <label for="numQuestions">Quantas perguntas deseja responder? (1 a 10)</label>
-      <input type="number" id="numQuestions" min="1" max="10" value="5" />
-
-      <label for="tema">Escolha o tema:</label>
-      <select id="tema">
-        <option value="logica">Lógica de Programação</option>
-        <option value="informatica">Informática Básica</option>
-        <option value="avancado">Tecnologia Avançada</option>
-      </select>
-
-      <label for="nivel">Escolha a dificuldade:</label>
-      <select id="nivel">
-        <option value="facil">Fácil</option>
-        <option value="medio">Médio</option>
-        <option value="dificil">Difícil</option>
-        <option value="extremo">Extremo</option>
-      </select>
-
-      <div class="buttons-row">
-        <button id="btn-start">Começar Quiz</button>
-        <button id="btn-help">Como jogar?</button>
-      </div>
-    </section>
-
-    <!-- Tela do quiz -->
-    <section class="container" id="quiz-screen" style="display:none;">
-      <div class="progress-bar" aria-label="Barra de progresso do quiz">
-        <div id="progress-fill"></div>
-      </div>
-
-      <div class="quiz-header">
-        <div id="player-name"></div>
-        <div class="timer" id="timer">15</div>
-      </div>
-
-      <div id="question-text"></div>
-      <div id="answers" role="radiogroup" aria-labelledby="question-text"></div>
-
-      <button id="confirm-btn" disabled>Confirmar Resposta</button>
-      <div id="feedback" aria-live="polite"></div>
-      <button id="next-btn" disabled>Próxima</button>
-      <div id="alert-msg" style="color:#ff5555; font-weight:bold; margin-top:12px; min-height: 26px;"></div>
-    </section>
-
-    <!-- Tela final -->
-    <section class="container" id="end-screen" style="display:none;">
-      <h2>Quiz Finalizado!</h2>
-      <p id="final-score"></p>
-      <button id="restart-btn">Reiniciar Quiz</button>
-    </section>
-
-  </main>
-
-  <!-- Modal ajuda -->
-  <div id="help-modal" class="modal" style="display:none;">
-    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="help-title">
-      <h3 id="help-title">Como jogar</h3>
-      <ul>
-        <li>Escolha o número de perguntas, tema e dificuldade.</li>
-        <li>Você terá 15 segundos para responder cada pergunta.</li>
-        <li>Clique na alternativa correta para selecionar.</li>
-        <li>Confirme sua resposta clicando em "Confirmar Resposta".</li>
-        <li>Respostas corretas ficam verdes, erradas vermelhas.</li>
-        <li>Use o botão "Próxima" para seguir.</li>
-        <li>Ao final, veja seu desempenho e tente melhorar.</li>
-      </ul>
-      <button id="close-help-btn">Fechar</button>
+    <div class="overlay" id="start-screen">
+        <h1>Quiz Gamer - TechBrain</h1>
+        <input type="text" id="player-name" placeholder="Digite seu nome..." maxlength="15" />
+        <div id="level-selection">
+            <label><input type="radio" name="level" value="easy" checked> Fácil</label>
+            <label><input type="radio" name="level" value="medium"> Médio</label>
+            <label><input type="radio" name="level" value="hard"> Difícil</label>
+        </div>
+        <button id="start-btn">Começar Quiz</button>
     </div>
-  </div>
 
-  <footer>
-    <p>© 2025 TechQuiz Pro - Desenvolvido por João Pedro</p>
-  </footer>
+    <div class="overlay hidden" id="quiz-screen">
+        <div id="quiz-container">
+            <div id="question">Pergunta aqui</div>
+            <div class="options" id="options"></div>
+            <div id="scoreboard">Pontuação: 0</div>
+            <button id="next-btn" disabled>Próxima</button>
+        </div>
+    </div>
 
-  <!-- Aqui entra seu script.js -->
-  <script src="script.js"></script>
+    <div class="overlay hidden" id="end-screen">
+        <h1>Fim do Quiz!</h1>
+        <p id="final-score"></p>
+        <button id="restart-btn">Jogar novamente</button>
+    </div>
+
+    <div id="ranking" class="hidden">
+        <h2>Ranking dos Jogadores</h2>
+        <ol id="ranking-list"></ol>
+    </div>
+
+    <audio id="bg-music" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3" loop></audio>
+    <audio id="click-sound" src="https://freesound.org/data/previews/522/522931_12232340-lq.mp3"></audio>
+    <audio id="correct-sound" src="https://freesound.org/data/previews/320/320655_5260873-lq.mp3"></audio>
+    <audio id="wrong-sound" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3"></audio>
+
+    <script>
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        const rankingDiv = document.getElementById('ranking');
+        const rankingList = document.getElementById('ranking-list');
+        const playerNameInput = document.getElementById('player-name');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreboard = document.getElementById('scoreboard');
+        const finalScoreEl = document.getElementById('final-score');
+
+        const bgMusic = document.getElementById('bg-music');
+        const clickSound = document.getElementById('click-sound');
+        const correctSound = document.getElementById('correct-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+
+        let questions = {
+            easy: [{
+                question: "Qual o console da Nintendo lançado em 2020?",
+                options: ["Switch", "Wii U", "GameCube", "DS"],
+                answer: 0
+            }, {
+                question: "Em que ano foi lançado o jogo Minecraft?",
+                options: ["2009", "2011", "2005", "2013"],
+                answer: 0
+            }, {
+                question: "Qual personagem é o mascote da Sega?",
+                options: ["Mario", "Sonic", "Pac-Man", "Mega Man"],
+                answer: 1
+            }],
+            medium: [{
+                question: "Qual a desenvolvedora do jogo 'The Witcher 3'?",
+                options: ["Bethesda", "CD Projekt Red", "Ubisoft", "Rockstar Games"],
+                answer: 1
+            }, {
+                question: "Em que jogo aparece o personagem 'Master Chief'?",
+                options: ["Halo", "Call of Duty", "Gears of War", "Destiny"],
+                answer: 0
+            }, {
+                question: "Qual o nome da moeda virtual usada em Fortnite?",
+                options: ["Robux", "V-Bucks", "Coins", "Gems"],
+                answer: 1
+            }],
+            hard: [{
+                question: "Qual é o nome do motor gráfico usado em 'Red Dead Redemption 2'?",
+                options: ["Unreal Engine", "Frostbite", "RAGE", "CryEngine"],
+                answer: 2
+            }, {
+                question: "Em qual ano foi lançado o primeiro jogo da série Dark Souls?",
+                options: ["2009", "2011", "2013", "2010"],
+                answer: 1
+            }, {
+                question: "Quem é o criador do jogo 'Doom' (1993)?",
+                options: ["John Carmack", "Shigeru Miyamoto", "Hideo Kojima", "Sid Meier"],
+                answer: 0
+            }]
+        };
+
+        let currentLevel = 'easy';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let playerName = '';
+
+        function playSound(sound) {
+            sound.currentTime = 0;
+            sound.play();
+        }
+
+        startBtn.addEventListener('click', () => {
+            playerName = playerNameInput.value.trim();
+            if (playerName === '') {
+                alert('Por favor, digite seu nome para começar.');
+                return;
+            }
+            currentLevel = document.querySelector('input[name="level"]:checked').value;
+            currentQuestions = shuffleArray(questions[currentLevel]);
+            currentQuestionIndex = 0;
+            score = 0;
+            startScreen.classList.add('hidden');
+            rankingDiv.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            updateQuestion();
+            updateScore();
+            bgMusic.volume = 0.1;
+            bgMusic.play();
+        });
+
+        restartBtn.addEventListener('click', () => {
+            endScreen.classList.add('hidden');
+            rankingDiv.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            playerNameInput.value = '';
+            bgMusic.pause();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= currentQuestions.length) {
+                endQuiz();
+            } else {
+                updateQuestion();
+                nextBtn.disabled = true;
+            }
+        });
+
+        function updateQuestion() {
+            playSound(clickSound);
+            const q = currentQuestions[currentQuestionIndex];
+            questionEl.textContent = `Q${currentQuestionIndex + 1}: ${q.question}`;
+            optionsEl.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.classList.add('option-btn');
+                btn.textContent = opt;
+                btn.addEventListener('click', () => selectOption(i));
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedIndex) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = optionsEl.querySelectorAll('button');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.answer) {
+                    btn.classList.add('correct');
+                }
+                if (i === selectedIndex && i !== q.answer) {
+                    btn.classList.add('wrong');
+                }
+            });
+            if (selectedIndex === q.answer) {
+                score += getPointsByLevel(currentLevel);
+                playSound(correctSound);
+            } else {
+                playSound(wrongSound);
+            }
+            updateScore();
+            nextBtn.disabled = false;
+        }
+
+        function updateScore() {
+            scoreboard.textContent = `Pontuação: ${score}`;
+        }
+
+        function endQuiz() {
+            bgMusic.pause();
+            quizScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScoreEl.textContent = `${playerName}, sua pontuação final é: ${score}`;
+            saveRanking(playerName, score);
+            showRanking();
+        }
+
+        function saveRanking(name, score) {
+            let rankings = JSON.parse(localStorage.getItem('quizRanking')) || [];
+            rankings.push({
+                name,
+                score
+            });
+            rankings.sort((a, b) => b.score - a.score);
+            if (rankings.length > 10) rankings = rankings.slice(0, 10);
+            localStorage.setItem('quizRanking', JSON.stringify(rankings));
+        }
+
+        function showRanking() {
+            let rankings = JSON.parse(localStorage.getItem('quizRanking')) || [];
+            rankingList.innerHTML = '';
+            rankings.forEach((player, idx) => {
+                const li = document.createElement('li');
+                li.textContent = `${idx + 1}. ${player.name} — ${player.score} pts`;
+                rankingList.appendChild(li);
+            });
+            rankingDiv.classList.remove('hidden');
+        }
+
+        function getPointsByLevel(level) {
+            switch (level) {
+                case 'easy':
+                    return 10;
+                case 'medium':
+                    return 20;
+                case 'hard':
+                    return 30;
+                default:
+                    return 10;
+            }
+        }
+
+        // Utilitário para embaralhar perguntas
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+    </script>
 </body>
+
 </html>
