@@ -264,6 +264,26 @@
                 question: "Qual personagem é o mascote da Sega?",
                 options: ["Mario", "Sonic", "Pac-Man", "Mega Man"],
                 answer: 1
+            }, {
+                question: "Qual desses é um exemplo de linguagem de programação?",
+                options: ["Python", "HTML", "Google", "Wi-Fi"],
+                answer: 0
+            }, {
+                question: "Qual a função principal do antivírus?",
+                options: ["Melhorar a internet", "Evitar vírus", "Atualizar o Windows", "Instalar jogos"],
+                answer: 1
+            }, {
+                question: "Em qual área a engenharia social é aplicada?",
+                options: ["Roubo físico", "Enganar pessoas", "Construção civil", "Hardware"],
+                answer: 1
+            }, {
+                question: "Qual destes é um sistema operacional?",
+                options: ["Chrome", "Excel", "Windows", "Facebook"],
+                answer: 2
+            }, {
+                question: "O que significa 'bug' na programação?",
+                options: ["Inseto no PC", "Erro no código", "Acelerador", "Velocidade de internet"],
+                answer: 1
             }],
             medium: [{
                 question: "Qual a desenvolvedora do jogo 'The Witcher 3'?",
@@ -276,6 +296,26 @@
             }, {
                 question: "Qual o nome da moeda virtual usada em Fortnite?",
                 options: ["Robux", "V-Bucks", "Coins", "Gems"],
+                answer: 1
+            }, {
+                question: "O que a função 'print()' faz em Python?",
+                options: ["Apaga dados", "Imprime na tela", "Faz cálculos", "Cria variáveis"],
+                answer: 1
+            }, {
+                question: "Qual destes é um tipo de ataque de engenharia social?",
+                options: ["Phishing", "Trojan", "Firewall", "Backup"],
+                answer: 0
+            }, {
+                question: "Em Java, qual palavra-chave é usada para criar uma nova instância de objeto?",
+                options: ["new", "create", "object", "instance"],
+                answer: 0
+            }, {
+                question: "Qual extensão representa um arquivo de código Java?",
+                options: [".java", ".py", ".exe", ".js"],
+                answer: 0
+            }, {
+                question: "O que é IDE?",
+                options: ["Uma linguagem", "Ambiente de Desenvolvimento", "Erro de sistema", "Extensão de arquivo"],
                 answer: 1
             }],
             hard: [{
@@ -290,8 +330,29 @@
                 question: "Quem é o criador do jogo 'Doom' (1993)?",
                 options: ["John Carmack", "Shigeru Miyamoto", "Hideo Kojima", "Sid Meier"],
                 answer: 0
+            }, {
+                question: "Qual técnica de engenharia social consiste em observar alguém digitando a senha?",
+                options: ["Shoulder Surfing", "Phishing", "Ransomware", "Spoofing"],
+                answer: 0
+            }, {
+                question: "No Python, qual estrutura é usada para laços de repetição com condição?",
+                options: ["for", "while", "loop", "repeat"],
+                answer: 1
+            }, {
+                question: "Em Java, o que significa 'public static void main(String[] args)'?",
+                options: ["Declaração de variável", "Função principal do programa", "Erro de compilação", "Biblioteca"],
+                answer: 1
+            }, {
+                question: "Qual protocolo é responsável por transferir páginas da web?",
+                options: ["FTP", "HTTP", "SMTP", "IP"],
+                answer: 1
+            }, {
+                question: "O que é SQL?",
+                options: ["Sistema de segurança", "Linguagem de consulta a banco de dados", "Tipo de vírus", "Hardware"],
+                answer: 1
             }]
         };
+
 
         let currentLevel = 'easy';
         let currentQuestions = [];
@@ -345,7 +406,11 @@
         function updateQuestion() {
             playSound(clickSound);
             const q = currentQuestions[currentQuestionIndex];
-            questionEl.textContent = `Q${currentQuestionIndex + 1}: ${q.question}`;
+            questionEl.textContent = Q$ {
+                currentQuestionIndex + 1
+            }: $ {
+                q.question
+            };
             optionsEl.innerHTML = '';
             q.options.forEach((opt, i) => {
                 const btn = document.createElement('button');
@@ -379,14 +444,20 @@
         }
 
         function updateScore() {
-            scoreboard.textContent = `Pontuação: ${score}`;
+            scoreboard.textContent = Pontuação: $ {
+                score
+            };
         }
 
         function endQuiz() {
             bgMusic.pause();
             quizScreen.classList.add('hidden');
             endScreen.classList.remove('hidden');
-            finalScoreEl.textContent = `${playerName}, sua pontuação final é: ${score}`;
+            finalScoreEl.textContent = $ {
+                playerName
+            }, sua pontuação final é: $ {
+                score
+            };
             saveRanking(playerName, score);
             showRanking();
         }
@@ -407,7 +478,15 @@
             rankingList.innerHTML = '';
             rankings.forEach((player, idx) => {
                 const li = document.createElement('li');
-                li.textContent = `${idx + 1}. ${player.name} — ${player.score} pts`;
+                li.textContent = $ {
+                    idx + 1
+                }.$ {
+                    player.name
+                }—
+                $ {
+                    player.score
+                }
+                pts;
                 rankingList.appendChild(li);
             });
             rankingDiv.classList.remove('hidden');
