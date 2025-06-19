@@ -1,275 +1,489 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quiz Gamer - TechBrain</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-    * { box-sizing: border-box; }
-    body, html {
-      margin: 0; padding: 0; height: 100%;
-      font-family: 'Press Start 2P', cursive;
-      background: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
-      background-size: cover;
-      color: #00ff00; text-shadow: 0 0 5px #0f0;
-    }
-    .overlay {
-      background: rgba(0,0,0,0.85); position: fixed; inset: 0;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      padding: 20px; animation: fadeIn 1s ease forwards;
-    }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .hidden { display: none; }
-    h1 { font-size: 2.5rem; margin-bottom: 20px; }
-    input, select, button {
-      font-family: inherit; margin-bottom: 20px;
-    }
-    input[type=text], select {
-      padding: 10px; width: 280px; font-size: 1rem;
-      border: 2px solid #00ff00; background: transparent; color: #00ff00; outline: none;
-      text-align: center;
-    }
-    button {
-      padding: 12px 25px; border: 2px solid #00ff00; background: transparent;
-      color: #00ff00; cursor: pointer; transition: .3s;
-    }
-    button:hover { background: #00ff00; color: #000; }
-    #quiz-container {
-      max-width: 700px; width: 100%; background: rgba(0,0,0,0.75);
-      padding: 20px; border-radius: 8px; animation: slideIn 0.7s ease forwards;
-    }
-    @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    #question { font-size: 1.25rem; margin-bottom: 15px; }
-    .options { display: flex; flex-direction: column; }
-    .option-btn {
-      margin: 8px 0; padding: 10px; font-size: 1rem;
-      background: transparent; border: 2px solid #00ff00;
-      color: #00ff00; cursor: pointer; border-radius: 5px; transition: .3s;
-    }
-    .option-btn:hover { background: #00ff00; color: #000; }
-    .option-btn.correct { background: #0f0; color: #000; border-color: #0f0; }
-    .option-btn.wrong { background: #f00; color: #fff; border-color: #f00; }
-    #scoreboard { margin-top: 20px; font-size: 1.1rem; }
-    #ranking {
-      margin-top: 30px; max-width: 700px; background: rgba(0,0,0,0.75);
-      padding: 15px; border-radius: 8px;
-    }
-    #ranking h2 { font-size: 1.5rem; margin-bottom: 10px; }
-    #ranking-list { list-style: none; padding: 0; }
-    #ranking-list li {
-      font-size: 1rem; border-bottom: 1px solid #00ff00; padding: 6px 0;
-    }
-    @media(max-width: 480px) {
-      h1 { font-size: 1.8rem; }
-      #question { font-size: 1rem; }
-      input, select, button, .option-btn { width: 100%; font-size: .9rem; padding: 8px; }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Gamer - TechBrain</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        * {
+            box-sizing: border-box;
+        }
+        
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Press Start 2P', cursive;
+            background: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #00ff00;
+            text-shadow: 0 0 5px #0f0;
+        }
+        
+        .overlay {
+            background: rgba(0, 0, 0, 0.85);
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 1s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        input,
+        select,
+        button {
+            font-family: inherit;
+            margin-bottom: 20px;
+        }
+        
+        input[type=text],
+        select {
+            padding: 10px;
+            width: 280px;
+            font-size: 1rem;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            outline: none;
+            text-align: center;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            cursor: pointer;
+            transition: .3s;
+        }
+        
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        #quiz-container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 20px;
+            border-radius: 8px;
+            animation: slideIn 0.7s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        #question {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .option-btn {
+            margin: 8px 0;
+            padding: 10px;
+            font-size: 1rem;
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: .3s;
+        }
+        
+        .option-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        .option-btn.correct {
+            background: #0f0;
+            color: #000;
+            border-color: #0f0;
+        }
+        
+        .option-btn.wrong {
+            background: #f00;
+            color: #fff;
+            border-color: #f00;
+        }
+        
+        #scoreboard,
+        #timer {
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+        
+        #ranking {
+            margin-top: 30px;
+            max-width: 700px;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        #ranking h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        #ranking-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        #ranking-list li {
+            font-size: 1rem;
+            border-bottom: 1px solid #00ff00;
+            padding: 6px 0;
+        }
+        
+        @media(max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            #question {
+                font-size: 1rem;
+            }
+            input,
+            select,
+            button,
+            .option-btn {
+                width: 100%;
+                font-size: .9rem;
+                padding: 8px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <div class="overlay" id="start-screen">
-    <h1>Quiz Gamer - TechBrain</h1>
-    <input type="text" id="player-name" placeholder="Digite seu nome..." maxlength="15" />
-    <select id="level-select">
+    <!-- TELA INICIAL -->
+    <div class="overlay" id="start-screen">
+        <h1>Quiz Gamer - TechBrain</h1>
+        <input type="text" id="player-name" placeholder="Digite seu nome..." maxlength="15" />
+        <select id="level-select">
       <option value="easy">Fácil</option>
       <option value="medium">Médio</option>
       <option value="hard">Difícil</option>
     </select>
-    <select id="category-select">
+        <select id="category-select">
       <option value="games">Games</option>
       <option value="programming">Programação</option>
       <option value="social">Engenharia Social</option>
     </select>
-    <button id="start-btn">Começar Quiz</button>
-  </div>
-
-  <div class="overlay hidden" id="quiz-screen">
-    <div id="quiz-container">
-      <div id="question"></div>
-      <div class="options" id="options"></div>
-      <div id="scoreboard">Pontuação: 0</div>
-      <button id="next-btn" disabled>Próxima</button>
+        <button id="start-btn">Começar Quiz</button>
     </div>
-  </div>
 
-  <div class="overlay hidden" id="end-screen">
-    <h1>Fim do Quiz!</h1>
-    <p id="final-score"></p>
-    <button id="restart-btn">Jogar novamente</button>
-  </div>
+    <!-- TELA DO QUIZ -->
+    <div class="overlay hidden" id="quiz-screen">
+        <div id="quiz-container">
+            <div id="question"></div>
+            <div class="options" id="options"></div>
+            <div id="scoreboard">Pontuação: 0</div>
+            <div id="timer">⏱️ Tempo: 15s</div>
+            <button id="next-btn" disabled>Próxima</button>
+        </div>
+    </div>
 
-  <div id="ranking" class="hidden">
-    <h2>Ranking dos Jogadores</h2>
-    <ol id="ranking-list"></ol>
-  </div>
+    <!-- TELA FINAL -->
+    <div class="overlay hidden" id="end-screen">
+        <h1>Fim do Quiz!</h1>
+        <p id="final-score"></p>
+        <button id="restart-btn">Jogar novamente</button>
+    </div>
 
-  <script>
-    const playerNameInput = document.getElementById('player-name');
-    const levelSelect = document.getElementById('level-select');
-    const categorySelect = document.getElementById('category-select');
-    const startBtn = document.getElementById('start-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const quizScreen = document.getElementById('quiz-screen');
-    const startScreen = document.getElementById('start-screen');
-    const endScreen = document.getElementById('end-screen');
-    const questionEl = document.getElementById('question');
-    const optionsEl = document.getElementById('options');
-    const scoreboard = document.getElementById('scoreboard');
-    const finalScoreEl = document.getElementById('final-score');
-    const restartBtn = document.getElementById('restart-btn');
-    const rankingDiv = document.getElementById('ranking');
-    const rankingList = document.getElementById('ranking-list');
+    <!-- RANKING -->
+    <div id="ranking" class="hidden">
+        <h2>Ranking dos Jogadores</h2>
+        <ol id="ranking-list"></ol>
+    </div>
 
-    const questions = {
-      easy: {
-        games: [
-          { question: "Qual o console da Nintendo lançado em 2020?", options: ["Switch", "Wii U", "GameCube", "DS"], answer: 0 },
-          { question: "Qual personagem é o mascote da Sega?", options: ["Mario", "Sonic", "Pac‑Man", "Mega Man"], answer: 1 }
-        ],
-        programming: [
-          { question: "Qual desses é um exemplo de linguagem de programação?", options: ["Python", "HTML", "Google", "Wi‑Fi"], answer: 0 },
-          { question: "O que significa 'bug' na programação?", options: ["Inseto no PC", "Erro no código", "Acelerador", "Velocidade de internet"], answer: 1 }
-        ],
-        social: [
-          { question: "Qual a função principal do antivírus?", options: ["Melhorar a internet", "Evitar vírus", "Atualizar o Windows", "Instalar jogos"], answer: 1 },
-          { question: "Em qual área a engenharia social é aplicada?", options: ["Roubo físico", "Enganar pessoas", "Construção civil", "Hardware"], answer: 1 }
-        ]
-      },
-      medium: {
-        games: [
-          { question: "Qual a desenvolvedora de 'The Witcher 3'?", options: ["Bethesda", "CD Projekt Red", "Ubisoft", "Rockstar Games"], answer: 1 },
-          { question: "Em que jogo aparece o personagem 'Master Chief'?", options: ["Halo", "Call of Duty", "Gears of War", "Destiny"], answer: 0 }
-        ],
-        programming: [
-          { question: "O que a função 'print()' faz em Python?", options: ["Apaga dados", "Imprime na tela", "Faz cálculos", "Cria variáveis"], answer: 1 },
-          { question: "Qual extensão representa um arquivo de código Java?", options: [".java", ".py", ".exe", ".js"], answer: 0 }
-        ],
-        social: [
-          { question: "Qual destes é um tipo de ataque de engenharia social?", options: ["Phishing", "Trojan", "Firewall", "Backup"], answer: 0 },
-          { question: "Em Java, qual palavra-chave cria nova instância?", options: ["new", "create", "object", "instance"], answer: 0 }
-        ]
-      },
-      hard: {
-        games: [
-          { question: "Qual motor gráfico usa 'Red Dead Redemption 2'?", options: ["Unreal", "Frostbite", "RAGE", "CryEngine"], answer: 2 },
-          { question: "Ano de lançamento de Dark Souls 1?", options: ["2009", "2011", "2013", "2010"], answer: 1 }
-        ],
-        programming: [
-          { question: "O que significa 'public static void main...' em Java?", options: ["Declaração de variável", "Função principal", "Erro de compilação", "Biblioteca"], answer: 1 },
-          { question: "Em Python, qual estrutura usa laços condicionais?", options: ["for", "while", "loop", "repeat"], answer: 1 }
-        ],
-        social: [
-          { question: "Que técnica observa alguém digitando senha?", options: ["Shoulder Surfing", "Phishing", "Ransomware", "Spoofing"], answer: 0 },
-          { question: "O que é SQL?", options: ["Sistema de segurança", "Linguagem de consulta B.D.", "Tipo de vírus", "Hardware"], answer: 1 }
-        ]
-      }
-    };
+    <!-- SONS -->
+    <audio id="click-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+    <audio id="correct-sound" src="https://www.soundjay.com/button/beep-06.wav"></audio>
+    <audio id="wrong-sound" src="https://www.soundjay.com/button/beep-10.wav"></audio>
+    <audio id="timeout-sound" src="https://www.soundjay.com/button/beep-05.wav"></audio>
 
-    let currentQuestions = [];
-    let currentIndex = 0;
-    let score = 0;
+    <script>
+        const playerNameInput = document.getElementById('player-name');
+        const levelSelect = document.getElementById('level-select');
+        const categorySelect = document.getElementById('category-select');
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const quizScreen = document.getElementById('quiz-screen');
+        const startScreen = document.getElementById('start-screen');
+        const endScreen = document.getElementById('end-screen');
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const scoreboard = document.getElementById('scoreboard');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+        const rankingDiv = document.getElementById('ranking');
+        const rankingList = document.getElementById('ranking-list');
+        const timerEl = document.getElementById('timer');
 
-    function shuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
+        const clickSound = document.getElementById('click-sound');
+        const correctSound = document.getElementById('correct-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+        const timeoutSound = document.getElementById('timeout-sound');
 
-    startBtn.addEventListener('click', () => {
-      const name = playerNameInput.value.trim();
-      if (!name) {
-        alert('Por favor, digite seu nome.');
-        return;
-      }
-      const level = levelSelect.value;
-      const category = categorySelect.value;
-      currentQuestions = shuffle(questions[level][category]);
-      currentIndex = 0;
-      score = 0;
-      startScreen.classList.add('hidden');
-      quizScreen.classList.remove('hidden');
-      showQuestion();
-      updateScore();
-    });
+        let currentQuestions = [],
+            currentIndex = 0,
+            score = 0;
+        let timer, timeLeft = 15;
 
-    nextBtn.addEventListener('click', () => {
-      currentIndex++;
-      if (currentIndex >= currentQuestions.length) {
-        endQuiz();
-      } else {
-        showQuestion();
-        nextBtn.disabled = true;
-      }
-    });
+        const questions = {
+            easy: {
+                games: [{
+                    question: "Qual o console da Nintendo lançado em 2020?",
+                    options: ["Switch", "Wii U", "GameCube", "DS"],
+                    answer: 0
+                }, {
+                    question: "Qual personagem é o mascote da Sega?",
+                    options: ["Mario", "Sonic", "Pac‑Man", "Mega Man"],
+                    answer: 1
+                }],
+                programming: [{
+                    question: "Qual desses é um exemplo de linguagem de programação?",
+                    options: ["Python", "HTML", "Google", "Wi‑Fi"],
+                    answer: 0
+                }, {
+                    question: "O que significa 'bug' na programação?",
+                    options: ["Inseto no PC", "Erro no código", "Acelerador", "Velocidade de internet"],
+                    answer: 1
+                }],
+                social: [{
+                    question: "Qual a função principal do antivírus?",
+                    options: ["Melhorar a internet", "Evitar vírus", "Atualizar o Windows", "Instalar jogos"],
+                    answer: 1
+                }, {
+                    question: "Em qual área a engenharia social é aplicada?",
+                    options: ["Roubo físico", "Enganar pessoas", "Construção civil", "Hardware"],
+                    answer: 1
+                }]
+            },
+            medium: {
+                games: [{
+                    question: "Qual a desenvolvedora de 'The Witcher 3'?",
+                    options: ["Bethesda", "CD Projekt Red", "Ubisoft", "Rockstar Games"],
+                    answer: 1
+                }, {
+                    question: "Em que jogo aparece o personagem 'Master Chief'?",
+                    options: ["Halo", "Call of Duty", "Gears of War", "Destiny"],
+                    answer: 0
+                }],
+                programming: [{
+                    question: "O que a função 'print()' faz em Python?",
+                    options: ["Apaga dados", "Imprime na tela", "Faz cálculos", "Cria variáveis"],
+                    answer: 1
+                }, {
+                    question: "Qual extensão representa um arquivo de código Java?",
+                    options: [".java", ".py", ".exe", ".js"],
+                    answer: 0
+                }],
+                social: [{
+                    question: "Qual destes é um tipo de ataque de engenharia social?",
+                    options: ["Phishing", "Trojan", "Firewall", "Backup"],
+                    answer: 0
+                }, {
+                    question: "Em Java, qual palavra-chave cria nova instância?",
+                    options: ["new", "create", "object", "instance"],
+                    answer: 0
+                }]
+            },
+            hard: {
+                games: [{
+                    question: "Qual motor gráfico usa 'Red Dead Redemption 2'?",
+                    options: ["Unreal", "Frostbite", "RAGE", "CryEngine"],
+                    answer: 2
+                }, {
+                    question: "Ano de lançamento de Dark Souls 1?",
+                    options: ["2009", "2011", "2013", "2010"],
+                    answer: 1
+                }],
+                programming: [{
+                    question: "O que significa 'public static void main...' em Java?",
+                    options: ["Declaração de variável", "Função principal", "Erro de compilação", "Biblioteca"],
+                    answer: 1
+                }, {
+                    question: "Em Python, qual estrutura usa laços condicionais?",
+                    options: ["for", "while", "loop", "repeat"],
+                    answer: 1
+                }],
+                social: [{
+                    question: "Que técnica observa alguém digitando senha?",
+                    options: ["Shoulder Surfing", "Phishing", "Ransomware", "Spoofing"],
+                    answer: 0
+                }, {
+                    question: "O que é SQL?",
+                    options: ["Sistema de segurança", "Linguagem de consulta B.D.", "Tipo de vírus", "Hardware"],
+                    answer: 1
+                }]
+            }
+        };
 
-    function showQuestion() {
-      const q = currentQuestions[currentIndex];
-      questionEl.textContent = q.question;
-      optionsEl.innerHTML = '';
-      q.options.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = opt;
-        btn.addEventListener('click', () => checkAnswer(i));
-        optionsEl.appendChild(btn);
-      });
-    }
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
 
-    function checkAnswer(selected) {
-      const q = currentQuestions[currentIndex];
-      const buttons = optionsEl.querySelectorAll('button');
-      buttons.forEach((btn, i) => {
-        btn.disabled = true;
-        if (i === q.answer) btn.classList.add('correct');
-        else if (i === selected) btn.classList.add('wrong');
-      });
-      if (selected === q.answer) {
-        score++;
-        updateScore();
-      }
-      nextBtn.disabled = false;
-    }
+        startBtn.addEventListener('click', () => {
+            const name = playerNameInput.value.trim();
+            if (!name) return alert('Por favor, digite seu nome.');
+            const level = levelSelect.value;
+            const category = categorySelect.value;
+            currentQuestions = shuffle(questions[level][category]);
+            currentIndex = 0;
+            score = 0;
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            showQuestion();
+            updateScore();
+        });
 
-    function updateScore() {
-      scoreboard.textContent = Pontuação: ${score};
-    }
+        nextBtn.addEventListener('click', () => {
+            currentIndex++;
+            if (currentIndex >= currentQuestions.length) endQuiz();
+            else {
+                showQuestion();
+                nextBtn.disabled = true;
+            }
+        });
 
-    function endQuiz() {
-      quizScreen.classList.add('hidden');
-      endScreen.classList.remove('hidden');
-      finalScoreEl.textContent = ${playerNameInput.value}, você acertou ${score} de ${currentQuestions.length}!;
-      saveRanking(playerNameInput.value, score);
-      showRanking();
-    }
+        function showQuestion() {
+            clearInterval(timer);
+            const q = currentQuestions[currentIndex];
+            questionEl.textContent = q.question;
+            optionsEl.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.addEventListener('click', () => {
+                    clickSound.play();
+                    checkAnswer(i);
+                });
+                optionsEl.appendChild(btn);
+            });
+            timeLeft = 15;
+            updateTimer();
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft === 0) {
+                    clearInterval(timer);
+                    timeoutSound.play();
+                    checkAnswer(-1);
+                }
+            }, 1000);
+        }
 
-    restartBtn.addEventListener('click', () => {
-      endScreen.classList.add('hidden');
-      rankingDiv.classList.add('hidden');
-      startScreen.classList.remove('hidden');
-      playerNameInput.value = '';
-    });
+        function updateTimer() {
+            timerEl.textContent = `⏱️ Tempo: ${timeLeft}s`;
+        }
 
-    function saveRanking(name, score) {
-      const arr = JSON.parse(localStorage.getItem('quizRanking')) || [];
-      arr.push({ name, score });
-      arr.sort((a, b) => b.score - a.score);
-      localStorage.setItem('quizRanking', JSON.stringify(arr.slice(0, 10)));
-    }
+        function checkAnswer(selected) {
+            clearInterval(timer);
+            const q = currentQuestions[currentIndex];
+            const buttons = optionsEl.querySelectorAll('button');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.answer) btn.classList.add('correct');
+                else if (i === selected) btn.classList.add('wrong');
+            });
+            if (selected === q.answer) {
+                score++;
+                correctSound.play();
+            } else if (selected !== -1) {
+                wrongSound.play();
+            }
+            updateScore();
+            nextBtn.disabled = false;
+        }
 
-    function showRanking() {
-      const arr = JSON.parse(localStorage.getItem('quizRanking')) || [];
-      rankingList.innerHTML = '';
-      arr.forEach((p, i) => {
-        const li = document.createElement('li');
-        li.textContent = ${i + 1}. ${p.name} — ${p.score} pts;
-        rankingList.appendChild(li);
-      });
-      rankingDiv.classList.remove('hidden');
-    }
-  </script>
+        function updateScore() {
+            scoreboard.textContent = `Pontuação: ${score}`;
+        }
+
+        function endQuiz() {
+            clearInterval(timer);
+            quizScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScoreEl.textContent = `${playerNameInput.value}, você acertou ${score} de ${currentQuestions.length}!`;
+            saveRanking(playerNameInput.value, score);
+            showRanking();
+        }
+
+        restartBtn.addEventListener('click', () => {
+            endScreen.classList.add('hidden');
+            rankingDiv.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            playerNameInput.value = '';
+        });
+
+        function saveRanking(name, score) {
+            const arr = JSON.parse(localStorage.getItem('quizRanking')) || [];
+            arr.push({
+                name,
+                score
+            });
+            arr.sort((a, b) => b.score - a.score);
+            localStorage.setItem('quizRanking', JSON.stringify(arr.slice(0, 10)));
+        }
+
+        function showRanking() {
+            const arr = JSON.parse(localStorage.getItem('quizRanking')) || [];
+            rankingList.innerHTML = '';
+            arr.forEach((p, i) => {
+                const li = document.createElement('li');
+                li.textContent = `${i + 1}. ${p.name} — ${p.score} pts`;
+                rankingList.appendChild(li);
+            });
+            rankingDiv.classList.remove('hidden');
+        }
+    </script>
 </body>
+
 </html>
