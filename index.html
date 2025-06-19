@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quiz Gamer - TechBrain</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -79,6 +79,7 @@
             color: #00ff00;
             cursor: pointer;
             transition: .3s;
+            border-radius: 5px;
         }
         
         button:hover {
@@ -86,14 +87,16 @@
             color: #000;
         }
         
-        #quiz-container,
-        #quiz {
+        #quiz-container {
             max-width: 700px;
             width: 100%;
             background: rgba(0, 0, 0, 0.75);
             padding: 20px;
             border-radius: 8px;
             animation: slideIn 0.7s ease forwards;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         @keyframes slideIn {
@@ -111,16 +114,19 @@
         #question {
             font-size: 1.25rem;
             margin-bottom: 15px;
+            text-align: center;
+            min-height: 60px;
         }
         
         .options,
         #options {
             display: flex;
             flex-direction: column;
+            width: 100%;
+            max-width: 500px;
         }
         
-        .option-btn,
-        .option {
+        .option-btn {
             margin: 8px 0;
             padding: 10px;
             font-size: 1rem;
@@ -130,10 +136,10 @@
             cursor: pointer;
             border-radius: 5px;
             transition: .3s;
+            text-align: center;
         }
         
-        .option-btn:hover,
-        .option:hover {
+        .option-btn:hover {
             background: #00ff00;
             color: #000;
         }
@@ -142,6 +148,7 @@
             background: #0f0;
             color: #000;
             border-color: #0f0;
+            box-shadow: 0 0 10px #0f0;
         }
         
         .option-btn.wrong {
@@ -151,376 +158,723 @@
         }
         
         #scoreboard,
-        #timer {
+        #lives,
+        #timer-container {
             margin-top: 20px;
             font-size: 1.1rem;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        #ranking {
-            margin-top: 30px;
-            max-width: 700px;
-            background: rgba(0, 0, 0, 0.75);
-            padding: 15px;
-            border-radius: 8px;
-        }
-        
-        #ranking h2 {
+        #lives span {
             font-size: 1.5rem;
-            margin-bottom: 10px;
+            margin-right: 5px;
         }
         
-        #ranking-list {
-            list-style: none;
-            padding: 0;
+        #timer-container {
+            flex-direction: column;
+            align-items: stretch;
         }
         
-        #ranking-list li {
-            font-size: 1rem;
-            border-bottom: 1px solid #00ff00;
-            padding: 6px 0;
+        #timer-bar {
+            height: 12px;
+            background: #0f0;
+            width: 100%;
+            border-radius: 6px;
+            margin-top: 5px;
+            transition: width 1s linear, background 1s linear;
         }
         
-        #result,
-        #tips {
+        #next-btn {
             margin-top: 20px;
-            display: none;
-            max-width: 700px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+            align-self: center;
+            min-width: 120px;
         }
         
-        #tips ul {
-            padding-left: 20px;
+        #next-btn:hover:not(:disabled) {
+            background: #00ff00;
+            color: #000;
         }
         
-        @media(max-width: 480px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            #question {
-                font-size: 1rem;
-            }
-            input,
-            select,
-            button,
-            .option-btn,
-            .option {
-                width: 100%;
-                font-size: .9rem;
-                padding: 8px;
-            }
+        #next-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        #quit-btn {
+            margin-top: 10px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: 2px solid #f00;
+            background: transparent;
+            color: #f00;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: .3s;
+            align-self: center;
+            min-width: 120px;
+        }
+        
+        #quit-btn:hover {
+            background: #f00;
+            color: #000;
+        }
+        
+        #ranking-back-btn {
+            padding: 12px 25px;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: .3s;
+        }
+        
+        #ranking-back-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        #ranking-fixed-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.75rem;
+            cursor: pointer;
+            z-index: 9999;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        #ranking-fixed-btn:hover {
+            background: #00ff00;
+            color: #000;
         }
     </style>
 </head>
 
 <body>
+    <!-- Botão fixo de Ranking -->
+    <button id="ranking-fixed-btn" title="Ver Ranking">🏆 Ranking</button>
+
     <div class="overlay" id="start-screen">
         <h1>Quiz Gamer - TechBrain</h1>
         <input type="text" id="player-name" placeholder="Digite seu nome..." maxlength="15" />
         <select id="level-select">
-      <option value="easy">Fácil</option>
-      <option value="medium">Médio</option>
-      <option value="hard">Difícil</option>
-    </select>
+            <option value="easy">Fácil</option>
+            <option value="medium">Médio</option>
+            <option value="hard">Difícil</option>
+        </select>
         <select id="category-select">
-      <option value="games">Games</option>
-      <option value="programming">Programação</option>
-      <option value="social">Engenharia Social</option>
-    </select>
+            <option value="games">Games</option>
+            <option value="programming">Programação</option>
+            <option value="social">Engenharia Social</option>
+        </select>
         <button id="start-btn">Começar Quiz</button>
+        <button id="how-to-play-btn">Como Jogar</button>
+    </div>
+
+    <div class="overlay hidden" id="how-to-play-modal">
+        <div id="quiz-container">
+            <h2>🎮 COMO JOGAR</h2>
+            <p>1. Escolha seu nome, categoria e dificuldade.</p>
+            <p>2. Você tem 3 vidas para errar perguntas.</p>
+            <p>3. Responda antes do tempo acabar (15 segundos por pergunta).</p>
+            <p>4. Clique na alternativa correta.</p>
+            <p>5. Ganhe pontos e tente sobreviver até o final!</p>
+            <button id="close-how-to-btn">Fechar</button>
+        </div>
     </div>
 
     <div class="overlay hidden" id="quiz-screen">
         <div id="quiz-container">
-            <div id="question"></div>
-            <div class="options" id="options"></div>
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
             <div id="scoreboard">Pontuação: 0</div>
-            <div id="timer">⏱ Tempo: 15s</div>
+            <div id="lives">Vidas: <span id="life1">❤</span><span id="life2">❤</span><span id="life3">❤</span></div>
+            <div id="timer-container">
+                Tempo restante:
+                <div id="timer-bar"></div>
+            </div>
             <button id="next-btn" disabled>Próxima</button>
+            <button id="quit-btn">Voltar para Início</button>
         </div>
     </div>
 
-    <div class="overlay hidden" id="end-screen">
-        <h1>Fim do Quiz!</h1>
-        <p id="final-score"></p>
-        <div id="result">
-            <h2 id="score-text"></h2>
-            <button id="restart-btn">Jogar novamente</button>
-        </div>
-        <div id="tips">
-            <h2>🛡 Dicas para não cair em golpes</h2>
-            <ul>
-                <li>Nunca forneça senhas por telefone, e-mail ou SMS.</li>
-                <li>Verifique o remetente antes de clicar em links.</li>
-                <li>Desconfie de ofertas boas demais para serem verdade.</li>
-                <li>Use autenticação em dois fatores (2FA).</li>
-                <li>Participe de treinamentos de segurança digital.</li>
-                <li>Confirme ligações suspeitas ligando para canais oficiais.</li>
-            </ul>
+    <div class="overlay hidden" id="ranking-screen">
+        <div id="quiz-container">
+            <h2>🏆 Ranking - TechBrain</h2>
+            <ol id="ranking-list" style="text-align:center; margin-bottom:20px; color:#0f0;"></ol>
+            <button id="ranking-back-btn">Voltar</button>
         </div>
     </div>
 
-    <div id="ranking" class="hidden">
-        <h2>Ranking dos Jogadores</h2>
-        <ol id="ranking-list"></ol>
-    </div>
-
-    <audio id="click-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
-    <audio id="correct-sound" src="https://www.soundjay.com/button/beep-06.wav"></audio>
-    <audio id="wrong-sound" src="https://www.soundjay.com/button/beep-10.wav"></audio>
-    <audio id="timeout-sound" src="https://www.soundjay.com/button/beep-05.wav"></audio>
+    <audio id="bg-music" loop src="https://cdn.pixabay.com/download/audio/2021/10/11/audio_04d6b44533.mp3?filename=retro-game-arcade-8-bit-11235.mp3"></audio>
+    <audio id="sound-correct" src="https://cdn.pixabay.com/download/audio/2021/10/10/audio_1c05d56f5e.mp3?filename=success-6070.mp3"></audio>
+    <audio id="sound-wrong" src="https://cdn.pixabay.com/download/audio/2021/09/21/audio_0ff285303a.mp3?filename=error-12641.mp3"></audio>
+    <audio id="sound-click" src="https://cdn.pixabay.com/download/audio/2022/03/29/audio_d799c34f68.mp3?filename=button-click-111794.mp3"></audio>
 
     <script>
-        // Em breve: JavaScript unificado será inserido aqui
-        const playerNameInput = document.getElementById('player-name');
-        const levelSelect = document.getElementById('level-select');
-        const categorySelect = document.getElementById('category-select');
-        const startBtn = document.getElementById('start-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const quizScreen = document.getElementById('quiz-screen');
-        const startScreen = document.getElementById('start-screen');
-        const endScreen = document.getElementById('end-screen');
-        const questionEl = document.getElementById('question');
-        const optionsEl = document.getElementById('options');
-        const scoreboard = document.getElementById('scoreboard');
-        const finalScoreEl = document.getElementById('final-score');
-        const resultDiv = document.getElementById('result');
-        const scoreText = document.getElementById('score-text');
-        const restartBtn = document.getElementById('restart-btn');
-        const rankingDiv = document.getElementById('ranking');
-        const rankingList = document.getElementById('ranking-list');
-        const timerEl = document.getElementById('timer');
-        const tipsDiv = document.getElementById('tips');
+        const startBtn = document.getElementById("start-btn");
+        const howToPlayBtn = document.getElementById("how-to-play-btn");
+        const closeHowToBtn = document.getElementById("close-how-to-btn");
+        const quizScreen = document.getElementById("quiz-screen");
+        const startScreen = document.getElementById("start-screen");
+        const howToPlayModal = document.getElementById("how-to-play-modal");
+        const rankingScreen = document.getElementById("ranking-screen");
+        const rankingList = document.getElementById("ranking-list");
+        const rankingBackBtn = document.getElementById("ranking-back-btn");
+        const rankingFixedBtn = document.getElementById("ranking-fixed-btn");
+        const quitBtn = document.getElementById("quit-btn");
+        const bgMusic = document.getElementById("bg-music");
+        const soundCorrect = document.getElementById("sound-correct");
+        const soundWrong = document.getElementById("sound-wrong");
+        const soundClick = document.getElementById("sound-click");
+        const nextBtn = document.getElementById("next-btn");
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const scoreboard = document.getElementById("scoreboard");
+        const timerBar = document.getElementById("timer-bar");
+        const livesEl = document.getElementById("lives");
 
-        const clickSound = document.getElementById('click-sound');
-        const correctSound = document.getElementById('correct-sound');
-        const wrongSound = document.getElementById('wrong-sound');
-        const timeoutSound = document.getElementById('timeout-sound');
+        let playerName = "";
+        let score = 0;
+        let currentQuestionIndex = 0;
+        let lives = 3;
+        let timer;
+        let timeLeft = 15;
+        let selectedLevel = "easy";
+        let selectedCategory = "games";
 
-        const bgMusic = new Audio("https://www.bensound.com/bensound-music/bensound-retrosoul.mp3");
-        bgMusic.loop = true;
-        bgMusic.volume = 0.3;
+        const questions = [
+            // 🌟 GAMES - FÁCIL
+            {
+                level: "Fácil",
+                category: "Games",
+                question: "Qual o nome do criador do jogo Minecraft?",
+                options: ["Markus Persson", "Notch", "Steve", "Alex"],
+                correct: 0
+            }, {
+                level: "Fácil",
+                category: "Games",
+                question: "Qual o mascote oficial da Nintendo?",
+                options: ["Sonic", "Link", "Mario", "Pikachu"],
+                correct: 2
+            }, {
+                level: "Fácil",
+                category: "Games",
+                question: "Qual console foi fabricado pela Sony?",
+                options: ["Xbox", "PlayStation", "Switch", "Dreamcast"],
+                correct: 1
+            }, {
+                level: "Fácil",
+                category: "Games",
+                question: "Qual gênero é o jogo FIFA?",
+                options: ["Corrida", "Esporte", "Ação", "RPG"],
+                correct: 1
+            }, {
+                level: "Fácil",
+                category: "Games",
+                question: "Sonic é mascote de qual empresa?",
+                options: ["Nintendo", "Sega", "Sony", "Microsoft"],
+                correct: 1
+            }, {
+                level: "Fácil",
+                category: "Games",
+                question: "Qual desses é um jogo de batalha real?",
+                options: ["Fortnite", "Minecraft", "The Sims", "Tetris"],
+                correct: 0
+            },
 
-        let currentQuestions = [],
-            currentIndex = 0,
+            // 🌟 GAMES - MÉDIO
+            {
+                level: "Médio",
+                category: "Games",
+                question: "Qual dessas franquias é da Rockstar Games?",
+                options: ["FIFA", "GTA", "Call of Duty", "Assassin's Creed"],
+                correct: 1
+            }, {
+                level: "Médio",
+                category: "Games",
+                question: "Em qual console foi lançado o primeiro jogo da série Zelda?",
+                options: ["SNES", "NES", "N64", "Switch"],
+                correct: 1
+            }, {
+                level: "Médio",
+                category: "Games",
+                question: "Em que ano foi lançado o primeiro PlayStation?",
+                options: ["1994", "1998", "2000", "1990"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Games",
+                question: "Qual empresa desenvolveu o jogo Overwatch?",
+                options: ["Blizzard", "Ubisoft", "Valve", "Epic Games"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Games",
+                question: "Em qual jogo você encontra o personagem Master Chief?",
+                options: ["Halo", "Gears of War", "Destiny", "Doom"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Games",
+                question: "Quem é o criador do personagem Mario?",
+                options: ["Hideo Kojima", "Shigeru Miyamoto", "Gabe Newell", "Phil Spencer"],
+                correct: 1
+            },
+
+            // 🌟 GAMES - DIFÍCIL
+            {
+                level: "Difícil",
+                category: "Games",
+                question: "Qual linguagem é usada no desenvolvimento do Unity?",
+                options: ["Java", "C#", "Python", "C++"],
+                correct: 1
+            }, {
+                level: "Difícil",
+                category: "Games",
+                question: "Qual jogo popular foi criado por Markus Persson?",
+                options: ["Minecraft", "Terraria", "Roblox", "Fortnite"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Games",
+                question: "Qual estúdio desenvolveu The Witcher 3?",
+                options: ["CD Projekt Red", "Bethesda", "BioWare", "Rockstar"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Games",
+                question: "Em que ano foi lançado o primeiro GTA?",
+                options: ["1997", "2001", "1999", "1995"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Games",
+                question: "Qual engine é usada em Fortnite?",
+                options: ["CryEngine", "Unreal Engine", "Unity", "Frostbite"],
+                correct: 1
+            }, {
+                level: "Difícil",
+                category: "Games",
+                question: "Dark Souls foi criado por qual diretor?",
+                options: ["Hidetaka Miyazaki", "Shigeru Miyamoto", "Gabe Newell", "Todd Howard"],
+                correct: 0
+            },
+
+            // 💻 PROGRAMAÇÃO - FÁCIL
+            {
+                level: "Fácil",
+                category: "Programação",
+                question: "Qual dessas é uma linguagem de programação?",
+                options: ["HTML", "CSS", "JavaScript", "Photoshop"],
+                correct: 2
+            }, {
+                level: "Fácil",
+                category: "Programação",
+                question: "O que significa 'bug' na programação?",
+                options: ["Inseto", "Erro", "Código", "Função"],
+                correct: 1
+            }, {
+                level: "Fácil",
+                category: "Programação",
+                question: "Qual linguagem é usada para criar páginas da web?",
+                options: ["HTML", "Python", "C#", "Java"],
+                correct: 0
+            }, {
+                level: "Fácil",
+                category: "Programação",
+                question: "CSS é usado para:",
+                options: ["Lógica", "Estilo", "Banco de dados", "Rede"],
+                correct: 1
+            }, {
+                level: "Fácil",
+                category: "Programação",
+                question: "Qual dessas é uma linguagem front-end?",
+                options: ["JavaScript", "MySQL", "PHP", "Python"],
+                correct: 0
+            }, {
+                level: "Fácil",
+                category: "Programação",
+                question: "Python é conhecido por ser:",
+                options: ["Difícil de aprender", "Fácil de ler", "Somente usado em web", "Somente para jogos"],
+                correct: 1
+            },
+
+            // 💻 PROGRAMAÇÃO - MÉDIO
+            {
+                level: "Médio",
+                category: "Programação",
+                question: "Qual método adiciona um elemento ao final de um array em JS?",
+                options: [".push()", ".pop()", ".shift()", ".unshift()"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Programação",
+                question: "Qual palavra-chave cria uma constante em JavaScript?",
+                options: ["var", "let", "const", "constant"],
+                correct: 2
+            }, {
+                level: "Médio",
+                category: "Programação",
+                question: "Qual desses é um framework de JS?",
+                options: ["React", "Django", "Laravel", "Flask"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Programação",
+                question: "PHP é usado principalmente para:",
+                options: ["Banco de dados", "Programação web", "Redes", "Criptografia"],
+                correct: 1
+            }, {
+                level: "Médio",
+                category: "Programação",
+                question: "SQL é usado para:",
+                options: ["Estilo", "Banco de dados", "Animações", "Frontend"],
+                correct: 1
+            }, {
+                level: "Médio",
+                category: "Programação",
+                question: "Git serve para:",
+                options: ["Controle de versão", "Estilo CSS", "Criar sites", "Desenhar gráficos"],
+                correct: 0
+            },
+
+            // 💻 PROGRAMAÇÃO - DIFÍCIL
+            {
+                level: "Difícil",
+                category: "Programação",
+                question: "O que significa DOM em JavaScript?",
+                options: ["Document Object Model", "Data Object Model", "Document Online Mode", "Data Online Model"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Programação",
+                question: "CSS serve para:",
+                options: ["Programar lógica", "Estilizar páginas", "Banco de dados", "Criptografar dados"],
+                correct: 1
+            }, {
+                level: "Difícil",
+                category: "Programação",
+                question: "O que é um closure em JavaScript?",
+                options: ["Função com escopo preservado", "Classe", "Array", "Objeto JSON"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Programação",
+                question: "O que é recursão?",
+                options: ["Função que chama a si mesma", "Laço infinito", "Classe abstrata", "Função anônima"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Programação",
+                question: "Em Python, o que faz o operador // ?",
+                options: ["Divisão inteira", "Módulo", "Exponenciação", "Divisão comum"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Programação",
+                question: "TypeScript é uma variação de qual linguagem?",
+                options: ["Python", "JavaScript", "C#", "PHP"],
+                correct: 1
+            },
+
+            // 🕵 ENGENHARIA SOCIAL - FÁCIL
+            {
+                level: "Fácil",
+                category: "Engenharia Social",
+                question: "Engenharia social visa explorar:",
+                options: ["Falhas humanas", "Erros de software", "Erros de hardware", "Redes Wi-Fi"],
+                correct: 0
+            }, {
+                level: "Fácil",
+                category: "Engenharia Social",
+                question: "O que é phishing?",
+                options: ["Antivírus", "Firewall", "Roubo de dados", "Proteção de rede"],
+                correct: 2
+            }, {
+                level: "Fácil",
+                category: "Engenharia Social",
+                question: "O que significa senha fraca?",
+                options: ["Fácil de adivinhar", "Forte proteção", "Senha criptografada", "Senha em 2FA"],
+                correct: 0
+            }, {
+                level: "Fácil",
+                category: "Engenharia Social",
+                question: "Qual ação protege contra phishing?",
+                options: ["Clicar em links", "Verificar remetente", "Compartilhar senhas", "Usar Wi-Fi público"],
+                correct: 1
+            }, {
+                level: "Fácil",
+                category: "Engenharia Social",
+                question: "O que é engenharia social?",
+                options: ["Manipulação psicológica", "Firewall avançado", "Antivírus", "Software de rede"],
+                correct: 0
+            }, {
+                level: "Fácil",
+                category: "Engenharia Social",
+                question: "Spam é:",
+                options: ["Email não solicitado", "Antivírus", "Firewall", "Senha forte"],
+                correct: 0
+            },
+
+            // 🕵 ENGENHARIA SOCIAL - MÉDIO
+            {
+                level: "Médio",
+                category: "Engenharia Social",
+                question: "O que é um ataque DoS?",
+                options: ["Negação de Serviço", "Roubo de dados", "Invasão física", "Antivírus"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Engenharia Social",
+                question: "O que significa 2FA?",
+                options: ["Autenticação de dois fatores", "Firewall avançado", "Backup duplo", "Antivírus"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Engenharia Social",
+                question: "O que significa spoofing?",
+                options: ["Falsificação de identidade", "Firewall", "Backup", "Antivírus"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Engenharia Social",
+                question: "Que prática ajuda a evitar engenharia social?",
+                options: ["Compartilhar senhas", "Desconfiar de pedidos suspeitos", "Usar senha fraca", "Clicar em qualquer link"],
+                correct: 1
+            }, {
+                level: "Médio",
+                category: "Engenharia Social",
+                question: "Um keylogger serve para:",
+                options: ["Capturar teclas digitadas", "Proteger rede", "Criptografar dados", "Bloquear spam"],
+                correct: 0
+            }, {
+                level: "Médio",
+                category: "Engenharia Social",
+                question: "O que é shoulder surfing?",
+                options: ["Espiar senha", "Firewall", "Antivírus", "Wi-Fi seguro"],
+                correct: 0
+            },
+
+            // 🕵 ENGENHARIA SOCIAL - DIFÍCIL
+            {
+                level: "Difícil",
+                category: "Engenharia Social",
+                question: "Senha forte deve conter:",
+                options: ["Nome e data", "Só números", "Letras, números e símbolos", "Somente letras"],
+                correct: 2
+            }, {
+                level: "Difícil",
+                category: "Engenharia Social",
+                question: "O que é um firewall?",
+                options: ["Barreira de proteção de rede", "Tipo de vírus", "Software de edição", "Hardware para armazenamento"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Engenharia Social",
+                question: "O que é engenharia reversa?",
+                options: ["Analisar e replicar sistema", "Firewall", "Criar vírus", "Criptografia"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Engenharia Social",
+                question: "O que é ransomware?",
+                options: ["Sequestro de dados", "Firewall", "Antivírus", "Criptografia de senha"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Engenharia Social",
+                question: "O que significa spear phishing?",
+                options: ["Phishing direcionado", "Firewall", "Spam", "Antivírus"],
+                correct: 0
+            }, {
+                level: "Difícil",
+                category: "Engenharia Social",
+                question: "Qual conceito envolve engenharia social em empresas?",
+                options: ["Espionagem corporativa", "Firewall", "Antivírus", "Backup"],
+                correct: 0
+            }
+        ];
+
+
+
+        startBtn.addEventListener("click", () => {
+            soundClick.play();
+            playerName = document.getElementById("player-name").value.trim() || "Jogador";
+            selectedLevel = document.getElementById("level-select").value;
+            selectedCategory = document.getElementById("category-select").value;
             score = 0;
-        let timer, timeLeft = 15;
+            currentQuestionIndex = 0;
+            lives = 3;
+            showScreen(quizScreen);
+            startQuiz();
+            bgMusic.volume = 0.2;
+            bgMusic.play();
+        });
 
-        const questions = {
-            easy: {
-                games: [{
-                    question: "Qual o console da Nintendo lançado em 2020?",
-                    options: ["Switch", "Wii U", "GameCube", "DS"],
-                    answer: 0
-                }, {
-                    question: "Qual personagem é o mascote da Sega?",
-                    options: ["Mario", "Sonic", "Pac‑Man", "Mega Man"],
-                    answer: 1
-                }],
-                programming: [{
-                    question: "Qual desses é um exemplo de linguagem de programação?",
-                    options: ["Python", "HTML", "Google", "Wi‑Fi"],
-                    answer: 0
-                }, {
-                    question: "O que significa 'bug' na programação?",
-                    options: ["Inseto no PC", "Erro no código", "Acelerador", "Velocidade de internet"],
-                    answer: 1
-                }],
-                social: [{
-                    question: "O que é engenharia social?",
-                    options: ["Engenharia civil", "Manipulação psicológica", "Sistema de criptografia", "Software de segurança"],
-                    answer: 1
-                }, {
-                    question: "Qual é o objetivo de um ataque de engenharia social?",
-                    options: ["Ajudar o usuário", "Melhorar performance", "Enganar para obter acesso", "Atualizar o SO"],
-                    answer: 2
-                }]
-            },
-            medium: {
-                games: [{
-                    question: "Qual a desenvolvedora de 'The Witcher 3'?",
-                    options: ["Bethesda", "CD Projekt Red", "Ubisoft", "Rockstar Games"],
-                    answer: 1
-                }, {
-                    question: "Em que jogo aparece 'Master Chief'?",
-                    options: ["Halo", "Call of Duty", "Gears of War", "Destiny"],
-                    answer: 0
-                }],
-                programming: [{
-                    question: "Função 'print()' em Python faz o quê?",
-                    options: ["Apaga dados", "Imprime na tela", "Faz cálculos", "Cria variáveis"],
-                    answer: 1
-                }, {
-                    question: "Extensão de arquivos Java?",
-                    options: [".java", ".py", ".exe", ".js"],
-                    answer: 0
-                }],
-                social: [{
-                    question: "O que é 'phishing'?",
-                    options: ["Pescar online", "Mensagem falsa para dados", "Teste de segurança", "Antivírus"],
-                    answer: 1
-                }, {
-                    question: "Exemplo de engenharia social?",
-                    options: ["Atualização de software", "Ligação falsa do banco", "Formatar PC", "Instalar firewall"],
-                    answer: 1
-                }]
-            },
-            hard: {
-                games: [{
-                    question: "Motor gráfico de RDR2?",
-                    options: ["Unreal", "Frostbite", "RAGE", "CryEngine"],
-                    answer: 2
-                }, {
-                    question: "Ano de lançamento do Dark Souls 1?",
-                    options: ["2009", "2011", "2013", "2010"],
-                    answer: 1
-                }],
-                programming: [{
-                    question: "O que é 'public static void main' em Java?",
-                    options: ["Variável", "Função principal", "Erro", "Biblioteca"],
-                    answer: 1
-                }, {
-                    question: "Laço condicional em Python?",
-                    options: ["for", "while", "loop", "repeat"],
-                    answer: 1
-                }],
-                social: [{
-                    question: "Shoulder Surfing é:",
-                    options: ["Observar senha", "Vírus", "Phishing", "Spoofing"],
-                    answer: 0
-                }, {
-                    question: "Melhor defesa contra golpes?",
-                    options: ["Firewall", "Antivírus", "Educação do usuário", "Desligar o PC"],
-                    answer: 2
-                }]
-            }
-        };
+        howToPlayBtn.addEventListener("click", () => {
+            soundClick.play();
+            howToPlayModal.classList.remove("hidden");
+        });
 
-        function shuffle(arr) {
-            const a = [...arr];
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [a[i], a[j]] = [a[j], a[i]];
-            }
-            return a;
+        closeHowToBtn.addEventListener("click", () => {
+            soundClick.play();
+            howToPlayModal.classList.add("hidden");
+        });
+
+        rankingFixedBtn.addEventListener("click", () => {
+            soundClick.play();
+            showRanking();
+        });
+
+        rankingBackBtn.addEventListener("click", () => {
+            soundClick.play();
+            showScreen(startScreen);
+        });
+
+        quitBtn.addEventListener("click", () => {
+            soundClick.play();
+            resetGame();
+        });
+
+        nextBtn.addEventListener("click", () => {
+            soundClick.play();
+            nextQuestion();
+        });
+
+        function showScreen(screen) {
+            [startScreen, quizScreen, howToPlayModal, rankingScreen].forEach(s => s.classList.add("hidden"));
+            screen.classList.remove("hidden");
         }
 
-        startBtn.addEventListener('click', () => {
-            const name = playerNameInput.value.trim();
-            if (!name) return alert('Por favor, digite seu nome.');
-            const level = levelSelect.value;
-            const category = categorySelect.value;
-            currentQuestions = shuffle(questions[level][category]);
-            currentIndex = 0;
-            score = 0;
-            startScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            bgMusic.play();
+        function startQuiz() {
             showQuestion();
-            updateScore();
-        });
-
-        nextBtn.addEventListener('click', () => {
-            currentIndex++;
-            if (currentIndex >= currentQuestions.length) endQuiz();
-            else {
-                showQuestion();
-                nextBtn.disabled = true;
-            }
-        });
+        }
 
         function showQuestion() {
             clearInterval(timer);
-            const q = currentQuestions[currentIndex];
-            questionEl.textContent = `(${currentIndex + 1}/${currentQuestions.length}) ${q.question}`;
-            optionsEl.innerHTML = '';
-            q.options.forEach((opt, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
-                btn.addEventListener('click', () => {
-                    clickSound.currentTime = 0;
-                    clickSound.play();
-                    checkAnswer(i);
-                });
-                optionsEl.appendChild(btn);
-            });
             timeLeft = 15;
-            updateTimer();
+            updateTimerBar();
             timer = setInterval(() => {
                 timeLeft--;
-                updateTimer();
-                if (timeLeft === 0) {
+                updateTimerBar();
+                if (timeLeft <= 0) {
                     clearInterval(timer);
-                    timeoutSound.play();
-                    checkAnswer(-1);
+                    loseLife();
                 }
             }, 1000);
-        }
 
-        function updateTimer() {
-            timerEl.textContent = `⏱ Tempo: ${timeLeft}s`;
-        }
-
-        function checkAnswer(selected) {
-            clearInterval(timer);
-            const q = currentQuestions[currentIndex];
-            const buttons = optionsEl.querySelectorAll('button');
-            buttons.forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === q.answer) btn.classList.add('correct');
-                else if (i === selected) btn.classList.add('wrong');
+            const q = questions[currentQuestionIndex];
+            questionEl.textContent = q.question;
+            optionsEl.innerHTML = "";
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement("button");
+                btn.textContent = opt;
+                btn.className = "option-btn";
+                btn.addEventListener("click", () => selectOption(idx));
+                optionsEl.appendChild(btn);
             });
-            if (selected === q.answer) {
-                score++;
-                correctSound.play();
-            } else if (selected !== -1) {
-                wrongSound.play();
+
+            nextBtn.disabled = true;
+        }
+
+        function selectOption(index) {
+            clearInterval(timer);
+            const q = questions[currentQuestionIndex];
+            const buttons = document.querySelectorAll(".option-btn");
+            buttons.forEach(b => b.disabled = true);
+
+            if (index === q.correct) {
+                buttons[index].classList.add("correct");
+                score += 10;
+                soundCorrect.play();
+            } else {
+                buttons[index].classList.add("wrong");
+                buttons[q.correct].classList.add("correct");
+                loseLife();
+                soundWrong.play();
             }
-            updateScore();
+
+            scoreboard.textContent = `Pontuação: ${score}`;
             nextBtn.disabled = false;
         }
 
-        function updateScore() {
-            scoreboard.textContent = `Pontuação: ${score}`;
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= questions.length || lives <= 0) {
+                endGame();
+            } else {
+                showQuestion();
+            }
         }
 
-        function endQuiz() {
+        function loseLife() {
+            lives--;
+            const lifeSpans = livesEl.querySelectorAll("span");
+            if (lifeSpans[lives]) {
+                lifeSpans[lives].textContent = "💔";
+            }
+            if (lives <= 0) {
+                endGame();
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        function updateTimerBar() {
+            const percent = (timeLeft / 15) * 100;
+            timerBar.style.width = percent + "%";
+            timerBar.style.background = timeLeft > 5 ? "#0f0" : "#f00";
+        }
+
+        function endGame() {
             clearInterval(timer);
-            quizScreen.classList.add('hidden');
-            endScreen.classList.remove('hidden');
-            finalScoreEl.textContent = `${playerNameInput.value}, você acertou ${score} de ${currentQuestions.length}!`;
-            scoreText.textContent = `Você acertou ${score} de ${currentQuestions.length} perguntas!`;
-            tipsDiv.style.display = 'block';
-            saveRanking(playerNameInput.value, score);
+            saveRanking(playerName, score);
             showRanking();
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
         }
-
-        restartBtn.addEventListener('click', () => {
-            endScreen.classList.add('hidden');
-            rankingDiv.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-            tipsDiv.style.display = 'none';
-            playerNameInput.value = '';
-        });
 
         function saveRanking(name, score) {
-            const arr = JSON.parse(localStorage.getItem('quizRanking')) || [];
-            arr.push({
+            const ranking = JSON.parse(localStorage.getItem("techbrain_ranking")) || [];
+            ranking.push({
                 name,
                 score
             });
-            arr.sort((a, b) => b.score - a.score);
-            localStorage.setItem('quizRanking', JSON.stringify(arr.slice(0, 10)));
+            ranking.sort((a, b) => b.score - a.score);
+            localStorage.setItem("techbrain_ranking", JSON.stringify(ranking.slice(0, 10)));
         }
 
         function showRanking() {
-            const arr = JSON.parse(localStorage.getItem('quizRanking')) || [];
-            rankingList.innerHTML = '';
-            arr.forEach((p, i) => {
-                const li = document.createElement('li');
-                li.textContent = `${i + 1}. ${p.name} — ${p.score} pts`;
-                rankingList.appendChild(li);
-            });
-            rankingDiv.classList.remove('hidden');
+            showScreen(rankingScreen);
+            const ranking = JSON.parse(localStorage.getItem("techbrain_ranking")) || [];
+            rankingList.innerHTML = ranking.map(r => `<li>${r.name}: ${r.score} pts</li>`).join("");
+        }
+
+        function resetGame() {
+            clearInterval(timer);
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            showScreen(startScreen);
         }
     </script>
 </body>
