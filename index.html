@@ -295,6 +295,10 @@
         const wrongSound = document.getElementById('wrong-sound');
         const timeoutSound = document.getElementById('timeout-sound');
 
+        const bgMusic = new Audio("https://www.bensound.com/bensound-music/bensound-retrosoul.mp3");
+        bgMusic.loop = true;
+        bgMusic.volume = 0.3;
+
         let currentQuestions = [],
             currentIndex = 0,
             score = 0;
@@ -409,6 +413,7 @@
             score = 0;
             startScreen.classList.add('hidden');
             quizScreen.classList.remove('hidden');
+            bgMusic.play();
             showQuestion();
             updateScore();
         });
@@ -432,6 +437,7 @@
                 btn.className = 'option-btn';
                 btn.textContent = opt;
                 btn.addEventListener('click', () => {
+                    clickSound.currentTime = 0;
                     clickSound.play();
                     checkAnswer(i);
                 });
