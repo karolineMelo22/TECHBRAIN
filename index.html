@@ -273,18 +273,20 @@
     <!-- Botão fixo de Ranking -->
     <button id="ranking-fixed-btn" title="Ver Ranking">🏆 Ranking</button>
 
+
+
     <div class="overlay" id="start-screen">
         <h1>Quiz Gamer - TechBrain</h1>
         <input type="text" id="player-name" placeholder="Digite seu nome..." maxlength="15" />
         <select id="level-select">
-            <option value="easy">Fácil</option>
-            <option value="medium">Médio</option>
-            <option value="hard">Difícil</option>
+            <option value="Fácil">Fácil</option>
+            <option value="Médio">Médio</option>
+            <option value="Difícil">Difícil</option>
         </select>
         <select id="category-select">
-            <option value="games">Games</option>
-            <option value="programming">Programação</option>
-            <option value="social">Engenharia Social</option>
+            <option value="Games">Games</option>
+            <option value="Programação">Programação</option>
+            <option value="Engenharia Social">Engenharia Social</option>
         </select>
         <button id="start-btn">Começar Quiz</button>
         <button id="how-to-play-btn">Como Jogar</button>
@@ -322,8 +324,10 @@
             <h2>🏆 Ranking - TechBrain</h2>
             <ol id="ranking-list" style="text-align:center; margin-bottom:20px; color:#0f0;"></ol>
             <button id="ranking-back-btn">Voltar</button>
+            <button id="clear-ranking-btn">Limpar Ranking</button>
         </div>
     </div>
+
 
     <audio id="bg-music" loop src="techbrain.mp3"></audio>
     <audio id="sound-correct" src="correto.mp3"></audio>
@@ -361,6 +365,8 @@
         let timeLeft = 15;
         let selectedLevel = "easy";
         let selectedCategory = "games";
+        let filteredQuestions = []; // 🌟 Adicione isso
+
 
         const questions = [
             // 🌟 GAMES - FÁCIL
@@ -726,9 +732,15 @@
             currentQuestionIndex = 0;
             lives = 3;
             showScreen(quizScreen);
-            startQuiz();
             bgMusic.volume = 0.2;
             bgMusic.play();
+
+            filteredQuestions = questions.filter(q =>
+                q.level.toLowerCase() === selectedLevel.toLowerCase() &&
+                q.category.toLowerCase() === selectedCategory.toLowerCase()
+            );
+
+            startQuiz();
         });
 
         howToPlayBtn.addEventListener("click", () => {
@@ -783,7 +795,7 @@
                 }
             }, 1000);
 
-            const q = questions[currentQuestionIndex];
+            const q = filteredQuestions[currentQuestionIndex];
             questionEl.textContent = q.question;
             optionsEl.innerHTML = "";
             q.options.forEach((opt, idx) => {
@@ -799,7 +811,7 @@
 
         function selectOption(index) {
             clearInterval(timer);
-            const q = questions[currentQuestionIndex];
+            const q = filteredQuestions[currentQuestionIndex]; // CORRIGIDO AQUI
             const buttons = document.querySelectorAll(".option-btn");
             buttons.forEach(b => b.disabled = true);
 
@@ -820,7 +832,7 @@
 
         function nextQuestion() {
             currentQuestionIndex++;
-            if (currentQuestionIndex >= questions.length || lives <= 0) {
+            if (currentQuestionIndex >= filteredQuestions.length || lives <= 0) {
                 endGame();
             } else {
                 showQuestion();
@@ -876,6 +888,14 @@
             bgMusic.currentTime = 0;
             showScreen(startScreen);
         }
+
+        const clearRankingBtn = document.getElementById("clear-ranking-btn");
+
+        clearRankingBtn.addEventListener("click", () => {
+            soundClick.play();
+            localStorage.removeItem("techbrain_ranking");
+            rankingList.innerHTML = "<li>Nenhum registro</li>";
+        });
     </script>
 </body>
 
